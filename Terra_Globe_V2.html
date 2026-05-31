@@ -460,11 +460,13 @@ html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); 
   #left-panel { display: none !important; }
 
   /* ── HIDE hover label (no hover on touch) ── */
-  /* ── HOVER LABEL — compact pill above challenge pill on mobile ── */
+  /* ── HOVER LABEL — compact pill at top-center, below logo row ── */
   #hover-label {
     opacity: 0;
-    top: auto;
-    bottom: calc(174px + env(safe-area-inset-bottom));
+    top: 68px;
+    bottom: auto;
+    left: 50%;
+    right: auto;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
