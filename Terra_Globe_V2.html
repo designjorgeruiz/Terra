@@ -384,7 +384,7 @@ html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); 
 
   /* ── CHALLENGE WRAP — glass card floating above action row ── */
   #challenge-wrap {
-    bottom: calc(118px + env(safe-area-inset-bottom));
+    bottom: calc(122px + env(safe-area-inset-bottom));
     left: 12px;
     right: 12px;
     width: auto;
@@ -430,27 +430,37 @@ html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); 
     padding: 6px 16px;
     font-size: 0.66rem;
   }
+  /* Override hint text for touch screens via CSS */
+  #dbl-hint { font-size: 0; }  /* hide original text node */
+  #dbl-hint::after {
+    content: '⊙ Double-tap to select';
+    font-size: 0.66rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 500;
+    letter-spacing: .06em;
+  }
 
-  /* ── SKIP & NEXT — large action row ── */
+  /* ── SKIP & NEXT — side by side above tab bar ── */
   #skip-btn, #next-btn {
-    bottom: calc(64px + env(safe-area-inset-bottom));
+    bottom: calc(62px + env(safe-area-inset-bottom));
     border-radius: 14px;
-    padding: 14px 22px;
-    font-size: 0.8rem;
+    padding: 13px 20px;
+    font-size: 0.78rem;
     letter-spacing: .04em;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     z-index: 25;
-    min-width: 110px;
-    min-height: 48px;
+    min-height: 46px;
   }
   #skip-btn {
     right: auto;
-    left: 12px;
+    left: 76px;
+    min-width: 100px;
     text-align: center;
   }
   #next-btn {
     right: 12px;
+    min-width: 110px;
   }
 
   /* ── HIDE DESKTOP LEFT PANEL entirely ── */
@@ -459,16 +469,16 @@ html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); 
   /* ── HIDE hover label (no hover on touch) ── */
   #hover-label { display: none !important; }
 
-  /* ── MOBILE FAB — floating controls button ── */
+  /* ── MOBILE FAB — bottom-left, same row as skip/next ── */
   #mobile-fab {
     display: flex;
     align-items: center;
     justify-content: center;
     position: fixed;
-    left: 16px;
-    bottom: calc(68px + env(safe-area-inset-bottom));
-    width: 44px;
-    height: 44px;
+    left: 12px;
+    bottom: calc(62px + env(safe-area-inset-bottom));
+    width: 46px;
+    height: 46px;
     border-radius: 13px;
     background: rgba(3,8,18,.88);
     border: 1px solid rgba(255,255,255,.1);
@@ -922,7 +932,7 @@ renderer.toneMappingExposure = 0.75;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 1000);
-camera.position.z = 2.7;
+camera.position.z = DEFAULT_CAMZ;
 
 window.addEventListener('resize', ()=>{
   camera.aspect = innerWidth/innerHeight;
@@ -1230,7 +1240,8 @@ let isDrag = false, dragStart = {x:0,y:0};
 let dragDist = 0; // track total drag distance to distinguish click vs drag
 let autoSpin = true;
 let rotationEnabled = true;
-let camZ = 2.7, targetCamZ = 2.7;
+const DEFAULT_CAMZ = window.innerWidth <= 768 ? 3.2 : 2.7;
+let camZ = DEFAULT_CAMZ, targetCamZ = DEFAULT_CAMZ;
 let viewLocked = false;
 
 // ── INTERACTION ───────────────────────────────────────────────────────
@@ -1312,7 +1323,7 @@ canvas.addEventListener('touchstart', e => {
 
 window.addEventListener('touchmove', e => {
   if (e.touches.length === 2) {
-    // Pinch-to-zoom
+    e.preventDefault(); // block iOS browser pinch-zoom; globe handles it below
     const t0 = e.touches[0], t1 = e.touches[1];
     const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
     if (pinchDist0 > 0) {
@@ -1331,7 +1342,7 @@ window.addEventListener('touchmove', e => {
   targetRotX += dy * 0.0022 * tiltScaleT;
   targetRotX = Math.max(-DRAG_TILT_LIMIT, Math.min(DRAG_TILT_LIMIT, targetRotX));
   dragStart = {x:e.touches[0].clientX, y:e.touches[0].clientY};
-}, {passive:true});
+}, {passive:false});
 
 let lastTap = 0;
 canvas.addEventListener('touchend', e => {
@@ -2442,7 +2453,7 @@ function nextQ(){
   document.getElementById('next-btn').classList.remove('show');
   closePanel();
   viewLocked = false;
-  targetCamZ = 2.7;
+  targetCamZ = DEFAULT_CAMZ;
   autoSpin = rotationEnabled;
   if(gameMode!=='continent') activeContinent = null;
 
@@ -2883,7 +2894,7 @@ function spinTo(c, zoom, hold=false, snap=false){
   if (snap) {
     camZ = targetCamZ;
     camera.position.z = camZ;
-  } else if(!hold && zoom){ setTimeout(()=>{targetCamZ=2.7;},2200); }
+  } else if(!hold && zoom){ setTimeout(()=>{targetCamZ=DEFAULT_CAMZ;},2200); }
 }
 
 function zoomToCorrect(country) {
@@ -2913,8 +2924,8 @@ function focusOnCountry(c, holdZoom=true, snap=false) {
   updateRotationButton();
   spinTo(target, true, holdZoom, snap);
   if (snap) {
-    targetCamZ = 2.7;
-    camZ = 2.7;
+    targetCamZ = DEFAULT_CAMZ;
+    camZ = DEFAULT_CAMZ;
     camera.position.z = camZ;
     rotX = targetRotX;
     rotY = targetRotY;
