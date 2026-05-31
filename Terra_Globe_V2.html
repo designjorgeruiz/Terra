@@ -382,63 +382,56 @@ html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); 
     letter-spacing: .02em;
   }
 
-  /* ── CHALLENGE WRAP — glass card floating above action row ── */
+  /* ── CHALLENGE WRAP — minimal floating pill ── */
   #challenge-wrap {
-    bottom: calc(122px + env(safe-area-inset-bottom));
-    left: 12px;
-    right: 12px;
+    bottom: calc(116px + env(safe-area-inset-bottom));
+    left: 50%;
+    right: auto;
     width: auto;
-    transform: none;
-    background: rgba(3,7,16,.82);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(0,229,200,.13);
-    border-radius: 18px;
-    padding: 14px 18px 12px;
-    box-shadow: 0 8px 40px rgba(0,0,0,.5);
+    max-width: calc(100vw - 32px);
+    transform: translateX(-50%);
+    background: rgba(4,10,22,.55);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 22px;
+    padding: 10px 24px 12px;
+    box-shadow: 0 2px 20px rgba(0,0,0,.25);
+    text-align: center;
   }
   #challenge-wrap.out {
-    transform: translateY(20px);
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
   }
   #chal-label {
-    font-size: 0.6rem;
-    letter-spacing: .15em;
-    margin-bottom: 8px;
+    font-size: 0.5rem;
+    letter-spacing: .2em;
+    margin-bottom: 3px;
+    opacity: 0.4;
   }
   #chal-text {
-    font-size: clamp(1.5rem, 6.5vw, 2.4rem);
-    text-shadow: 0 0 40px var(--aqua-glow);
-    line-height: 1.1;
+    font-size: clamp(1.35rem, 5.5vw, 2rem);
+    text-shadow: none;
+    line-height: 1.15;
   }
   #chal-flag {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
   #chal-flag .flag-img {
-    width: 76px;
-    height: 52px;
+    width: 60px;
+    height: 40px;
+    border-radius: 4px;
   }
   #chal-shape {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
   #chal-shape-inner {
-    width: 160px;
-    height: 112px;
-    border-radius: 12px;
+    width: 130px;
+    height: 90px;
+    border-radius: 10px;
   }
-  #dbl-hint {
-    margin-top: 10px;
-    padding: 6px 16px;
-    font-size: 0.66rem;
-  }
-  /* Override hint text for touch screens via CSS */
-  #dbl-hint { font-size: 0; }  /* hide original text node */
-  #dbl-hint::after {
-    content: '⊙ Double-tap to select';
-    font-size: 0.66rem;
-    font-family: 'Syne', sans-serif;
-    font-weight: 500;
-    letter-spacing: .06em;
-  }
+  /* Hide double-tap hint on mobile — users discover it naturally */
+  #dbl-hint { display: none !important; }
 
   /* ── SKIP & NEXT — side by side above tab bar ── */
   #skip-btn, #next-btn {
