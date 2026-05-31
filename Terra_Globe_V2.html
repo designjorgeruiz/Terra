@@ -1,0 +1,2702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TERRA — World Explorer</title>
+<link rel="stylesheet" href="terra_globe_v2.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Syne:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap');
+
+:root {
+  --ink: #020509;
+  --aqua: #00e5c8;
+  --aqua-dim: rgba(0,229,200,0.12);
+  --aqua-glow: rgba(0,229,200,0.35);
+  --gold: #ffc46b;
+  --gold-dim: rgba(255,196,107,0.15);
+  --coral: #ff6b6b;
+  --pearl: #dce8f5;
+  --mist: rgba(220,232,245,0.4);
+  --glass: rgba(4,10,22,0.85);
+  --border: rgba(0,229,200,0.1);
+  --border2: rgba(255,255,255,0.06);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); font-family:'Syne',sans-serif; font-weight:300; overflow:hidden; }
+
+#starfield { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse at 30% 40%,#08152a 0%,#020509 70%); pointer-events:none; }
+.star { position:absolute; border-radius:50%; background:#fff; animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s); }
+@keyframes twinkle { 0%,100%{opacity:var(--o,.5);transform:scale(1)} 50%{opacity:.05;transform:scale(.3)} }
+
+#three-canvas { position:fixed; inset:0; z-index:1; }
+
+/* LOGO */
+#logo { position:fixed; top:24px; left:30px; z-index:20; pointer-events:none; }
+#logo h1 { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:400; letter-spacing:.18em; line-height:1; }
+#logo h1 em { color:var(--aqua); font-style:normal; }
+#logo p { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:500; letter-spacing:.22em; color:rgba(220,232,245,.38); margin-top:6px; text-transform:uppercase; }
+
+/* TABS */
+#tabs { position:fixed; top:24px; left:50%; transform:translateX(-50%); display:flex; gap:2px; background:rgba(3,8,18,.92); border:1px solid rgba(255,255,255,.09); border-radius:14px; padding:4px; backdrop-filter:blur(28px); pointer-events:all; z-index:20; box-shadow:0 4px 28px rgba(0,0,0,.45); }
+.tab { padding:10px 18px; border-radius:10px; border:none; background:transparent; color:rgba(220,232,245,.45); font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:500; letter-spacing:.01em; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.tab:hover { color:var(--pearl); background:rgba(255,255,255,.05); }
+.tab.active { background:rgba(0,229,200,.13); color:var(--aqua); box-shadow:inset 0 1px 0 rgba(0,229,200,.2); }
+
+/* SCORE */
+#scorebox { position:fixed; top:24px; right:30px; text-align:right; pointer-events:none; z-index:20; }
+#score-num { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:400; line-height:1; transition:transform .15s cubic-bezier(.34,1.56,.64,1); }
+#score-num span { color:var(--aqua); }
+#score-num.pop { animation:scorePop .3s cubic-bezier(.34,1.56,.64,1); }
+@keyframes scorePop { 0%{transform:scale(1)} 50%{transform:scale(1.18)} 100%{transform:scale(1)} }
+#score-pct { font-family:'Syne',sans-serif; font-size:0.62rem; font-weight:500; letter-spacing:.1em; color:rgba(220,232,245,.28); margin-top:4px; text-transform:uppercase; min-height:1em; }
+#streak-tag { font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:500; letter-spacing:.14em; color:rgba(220,232,245,.38); margin-top:5px; text-transform:uppercase; transition:font-size .2s, color .2s; }
+#streak-tag.fire { color:var(--gold); opacity:.9; }
+#streak-tag.hot { color:var(--gold); font-size:0.82rem; letter-spacing:.1em; text-shadow:0 0 18px rgba(255,196,107,.5); }
+
+/* CHALLENGE */
+#challenge-wrap { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); text-align:center; pointer-events:none; z-index:20; transition:opacity .5s,transform .5s cubic-bezier(.16,1,.3,1); }
+#challenge-wrap.out { opacity:0; transform:translateX(-50%) translateY(16px); }
+#chal-label { font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:500; letter-spacing:.18em; color:rgba(220,232,245,.42); text-transform:uppercase; margin-bottom:10px; }
+#chal-flag { margin-bottom:14px; display:none; animation:flagFloat 3.2s ease-in-out infinite; }
+#chal-shape { margin-bottom:14px; display:none; animation:flagFloat 4s ease-in-out infinite; }
+#chal-shape-inner { width:210px; height:148px; border-radius:16px; background:rgba(0,229,200,.04); border:1px solid rgba(0,229,200,.18); display:flex; align-items:center; justify-content:center; padding:16px; box-sizing:border-box; margin:0 auto; position:relative; overflow:hidden; backdrop-filter:blur(6px); }
+#chal-shape-inner::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 60%, rgba(0,229,200,.07) 0%, transparent 70%); pointer-events:none; }
+#chal-shape-inner svg { max-width:100%; max-height:100%; filter:drop-shadow(0 0 14px rgba(0,229,200,.45)); animation:shapeIn .5s cubic-bezier(.16,1,.3,1) both; }
+#chal-shape-inner svg .country-fill { fill:rgba(0,229,200,.18); }
+#chal-shape-inner svg .country-stroke { stroke:rgba(100,255,230,.95); stroke-width:1.6; }
+#chal-flag .flag-img { width:96px; height:64px; object-fit:cover; border-radius:6px; box-shadow:0 8px 32px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.1); display:block; margin:0 auto; }
+@keyframes flagFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+#chal-text { font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3.6rem); font-style:italic; color:var(--pearl); text-shadow:0 0 60px var(--aqua-glow); line-height:1.1; }
+#dbl-hint { margin-top:14px; display:inline-flex; align-items:center; gap:8px; background:rgba(0,229,200,.07); border:1px solid rgba(0,229,200,.2); border-radius:24px; padding:8px 20px; font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.06em; color:var(--aqua); animation:pulse2 2s ease-in-out infinite; }
+@keyframes pulse2 { 0%,100%{opacity:.65} 50%{opacity:1;box-shadow:0 0 18px var(--aqua-glow)} }
+
+/* PROGRESS — bar removed; round count is no longer displayed */
+
+/* ── EXPLORE MODAL ─────────────────────────────────────────────────── */
+#explore-modal { position:fixed; inset:0; z-index:55; display:none; align-items:center; justify-content:center; background:rgba(2,5,9,.78); backdrop-filter:blur(14px); animation:fadeIn .25s ease both; }
+#explore-modal.on { display:flex; }
+#explore-card { width:min(880px, calc(100vw - 36px)); max-height:calc(100vh - 60px); overflow:hidden; display:flex; flex-direction:column; background:linear-gradient(180deg,#08111e 0%,#03070d 100%); border:1px solid rgba(0,229,200,.18); border-radius:24px; box-shadow:0 30px 90px rgba(0,0,0,.7); animation:exPop .35s cubic-bezier(.18,1.2,.32,1) both; }
+@keyframes exPop { from { transform:scale(.92); opacity:0 } to { transform:scale(1); opacity:1 } }
+#explore-hero { position:relative; padding:36px 40px 26px; border-bottom:1px solid rgba(255,255,255,.05); display:flex; gap:24px; align-items:center; }
+#explore-hero-bg { position:absolute; inset:0; opacity:.55; background:radial-gradient(ellipse at 25% 50%, rgba(0,229,200,.18), transparent 65%); pointer-events:none; }
+#explore-flag { position:relative; flex:0 0 auto; }
+#explore-flag .flag-img { width:120px; height:80px; object-fit:cover; border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.08); }
+#explore-titlebox { position:relative; flex:1; min-width:0; }
+#explore-name { font-family:'Playfair Display',serif; font-size:2.6rem; font-style:italic; color:var(--pearl); line-height:1.05; margin-bottom:8px; }
+#explore-region { font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.1em; color:var(--aqua); text-transform:uppercase; opacity:.85; }
+#explore-close { position:absolute; top:18px; right:18px; width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:rgba(220,232,245,.6); font-size:1rem; cursor:pointer; pointer-events:all; transition:all .2s; z-index:2; display:flex; align-items:center; justify-content:center; }
+#explore-close:hover { background:rgba(255,80,80,.12); border-color:rgba(255,120,120,.35); color:#fff; }
+#explore-body { padding:22px 40px 30px; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+@media (max-width:720px){ #explore-body { grid-template-columns:1fr; padding:20px 24px 26px; } #explore-name { font-size:2rem; } #explore-flag .flag-img { width:88px; height:60px; } #explore-hero { padding:24px 26px 18px; } }
+#explore-shape-wrap { display:flex; flex-direction:column; gap:10px; align-items:stretch; margin-bottom:16px; }
+#explore-shape { width:100%; aspect-ratio:1.5/1; min-height:160px; border-radius:16px; background:radial-gradient(ellipse at 50% 60%, rgba(0,229,200,.07) 0%, rgba(0,229,200,.02) 60%, transparent 100%); border:1px solid rgba(0,229,200,.18); display:flex; align-items:center; justify-content:center; padding:18px; box-sizing:border-box; position:relative; overflow:hidden; }
+#explore-shape::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(0,229,200,.04) 0%, transparent 60%); pointer-events:none; }
+#explore-shape svg { width:100%; height:100%; max-width:100%; max-height:100%; display:block; filter:drop-shadow(0 2px 18px rgba(0,229,200,.35)); animation:shapeIn .5s cubic-bezier(.16,1,.3,1) both; }
+@keyframes shapeIn { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+#explore-shape svg .country-fill { fill:rgba(0,229,200,.15); }
+#explore-shape svg .country-stroke { fill:none; stroke:rgba(100,255,230,1); stroke-width:1.4; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+#explore-shape-caption { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:400; letter-spacing:.12em; color:rgba(220,232,245,.35); text-transform:uppercase; text-align:center; }
+#explore-stats { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; align-content:start; }
+.ex-stat { display:flex; flex-direction:column; gap:4px; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.04); }
+.ex-stat .lbl { font-family:'Syne',sans-serif; font-size:0.62rem; font-weight:500; letter-spacing:.1em; color:rgba(220,232,245,.4); text-transform:uppercase; }
+.ex-stat .val { font-family:'Syne',sans-serif; font-size:0.88rem; font-weight:400; color:var(--pearl); line-height:1.3; }
+#explore-facts-ttl { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:.14em; color:var(--gold); text-transform:uppercase; margin-bottom:14px; opacity:.85; }
+#explore-facts { display:flex; flex-direction:column; gap:12px; }
+.ex-fact { display:flex; gap:14px; align-items:flex-start; padding:12px 14px; border-radius:12px; background:rgba(0,229,200,.04); border:1px solid rgba(0,229,200,.08); animation:fadeIn .45s ease both; }
+.ex-fact .n { flex:0 0 auto; font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:.06em; color:var(--aqua); padding-top:2px; opacity:.7; }
+.ex-fact .t { flex:1; font-family:'Syne',sans-serif; font-size:0.88rem; font-weight:400; color:rgba(220,232,245,.82); line-height:1.6; }
+#explore-actions { grid-column:1 / -1; display:flex; gap:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,.06); margin-top:6px; }
+#explore-collect-btn { padding:12px 24px; border-radius:10px; border:1px solid rgba(0,229,200,.35); background:rgba(0,229,200,.08); color:var(--aqua); font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:600; letter-spacing:.05em; cursor:pointer; pointer-events:all; transition:all .2s; }
+#explore-collect-btn:hover { background:rgba(0,229,200,.16); border-color:var(--aqua); transform:translateY(-1px); }
+#explore-collect-btn.collected { color:var(--gold); border-color:rgba(255,196,107,.4); background:rgba(255,196,107,.07); }
+
+/* NEXT BTN */
+#next-btn { position:fixed; bottom:90px; right:30px; padding:13px 28px; border-radius:12px; border:1px solid rgba(0,229,200,.4); background:rgba(0,229,200,.1); color:var(--aqua); font-family:'Syne',sans-serif; font-size:0.82rem; font-weight:600; letter-spacing:.06em; cursor:pointer; z-index:20; pointer-events:all; backdrop-filter:blur(16px); transition:all .25s; display:none; box-shadow:0 4px 20px rgba(0,229,200,.12); }
+#next-btn.show { display:block; animation:slideUp .4s ease forwards; }
+#next-btn:hover { background:rgba(0,229,200,.2); border-color:var(--aqua); box-shadow:0 6px 28px rgba(0,229,200,.2); transform:translateY(-1px); }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* SKIP BTN */
+#skip-btn { position:fixed; bottom:90px; right:30px; padding:13px 28px; border-radius:12px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); color:rgba(220,232,245,.5); font-family:'Syne',sans-serif; font-size:0.82rem; font-weight:500; letter-spacing:.04em; cursor:pointer; z-index:20; pointer-events:all; backdrop-filter:blur(16px); transition:background .2s, color .2s, border-color .2s; display:none; }
+#skip-btn.show { display:block; animation:slideUp .4s ease forwards; }
+#skip-btn:hover { background:rgba(255,255,255,.08); color:var(--pearl); border-color:rgba(255,255,255,.2); }
+@keyframes skipDismiss { 0%{transform:scale(1);opacity:1} 30%{transform:scale(1.07);opacity:1;background:rgba(255,255,255,.12)} 100%{transform:scale(.9) translateX(12px);opacity:0} }
+#skip-btn.skipping { animation:skipDismiss .38s cubic-bezier(.4,0,1,1) forwards; pointer-events:none; }
+
+/* FEEDBACK */
+#feedback { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:40; pointer-events:none; opacity:0; transition:opacity .3s; }
+#feedback.show { opacity:1; }
+#fb-inner { text-align:center; }
+#fb-icon { font-size:4.5rem; margin-bottom:6px; animation:popIn .4s cubic-bezier(.34,1.56,.64,1); }
+#fb-text { font-family:'Playfair Display',serif; font-size:2.8rem; font-style:italic; }
+@keyframes popIn { from{transform:scale(0)} to{transform:scale(1)} }
+#feedback.ok #fb-text { color:var(--aqua); }
+#feedback.bad #fb-text { color:var(--coral); }
+
+/* INFO PANEL — replaced by the centred explore modal. The shared
+   .flag-img sizing rule still ships here so flags render the same in the
+   collection cards and in the hover label. */
+.card-flag .flag-img, #tip-name .flag-img { width:1.6em; height:1.15em; object-fit:cover; border-radius:3px; vertical-align:-0.18em; box-shadow:0 2px 10px rgba(0,0,0,.35); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+
+/* CONTINENT PICKER */
+#continent-picker { position:fixed; inset:0; z-index:55; display:none; align-items:center; justify-content:center; background:rgba(2,5,9,.72); backdrop-filter:blur(10px); }
+#continent-picker.on { display:flex; }
+#continent-card { width:min(640px,calc(100vw - 32px)); background:var(--glass); border:1px solid var(--border); border-radius:24px; padding:28px; box-shadow:0 30px 90px rgba(0,0,0,.65); }
+#continent-title { font-family:'Playfair Display',serif; font-size:2.2rem; font-style:italic; margin-bottom:8px; }
+#continent-desc { font-family:'Syne',sans-serif; font-size:0.75rem; font-weight:400; letter-spacing:.06em; color:rgba(220,232,245,.45); margin-bottom:24px; }
+#continent-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.continent-btn { padding:16px 18px; border-radius:18px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); color:var(--pearl); cursor:pointer; text-align:left; transition:transform .25s, border-color .25s, background .25s; }
+.continent-btn:hover { transform:translateY(-2px); border-color:rgba(0,229,200,.24); background:rgba(0,229,200,.07); }
+.continent-btn strong { display:block; font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:400; margin-bottom:4px; }
+.continent-btn span { font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:400; letter-spacing:.04em; color:rgba(220,232,245,.45); }
+
+/* COLLECTION SELECT MODE */
+.card-check { position:absolute; top:10px; right:10px; width:22px; height:22px; border-radius:6px; border:1.5px solid rgba(255,255,255,.25); background:rgba(3,8,18,.55); display:none; align-items:center; justify-content:center; z-index:5; transition:all .2s; backdrop-filter:blur(4px); }
+.card-check svg { opacity:0; transition:opacity .15s; }
+#collector.selecting .card-check { display:flex; }
+.country-card.selected .card-check { background:var(--aqua); border-color:var(--aqua); }
+.country-card.selected .card-check svg { opacity:1; }
+.country-card.selected { border-color:rgba(0,229,200,.4); }
+.country-card.selected::before { content:''; position:absolute; inset:0; background:rgba(0,229,200,.06); z-index:4; pointer-events:none; border-radius:10px; }
+#coll-select-actions { display:none; align-items:center; gap:8px; margin-left:auto; }
+#collector.selecting #coll-select-actions { display:flex; }
+#collector.selecting #coll-sort-label,
+#collector.selecting #sort-continent-btn,
+#collector.selecting #sort-alpha-btn,
+#collector.selecting #coll-select-btn { display:none; }
+#coll-select-count { font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:500; letter-spacing:.06em; color:rgba(220,232,245,.4); }
+#coll-done-btn { padding:8px 16px; border-radius:9px; border:1px solid rgba(255,255,255,.12); background:transparent; color:rgba(220,232,245,.6); font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.04em; cursor:pointer; transition:all .2s; }
+#coll-done-btn:hover { border-color:rgba(255,255,255,.25); color:var(--pearl); background:rgba(255,255,255,.05); }
+#coll-delete-sel-btn { padding:8px 16px; border-radius:9px; border:1px solid rgba(255,107,107,.2); background:transparent; color:rgba(255,150,150,.5); font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.04em; cursor:pointer; transition:all .2s; }
+#coll-delete-sel-btn:not(:disabled):hover { border-color:rgba(255,107,107,.45); background:rgba(255,107,107,.1); color:rgba(255,150,150,.95); }
+#coll-delete-sel-btn:disabled { opacity:.3; cursor:default; }
+#coll-delete-all-btn { padding:8px 16px; border-radius:9px; border:1px solid rgba(255,107,107,.15); background:transparent; color:rgba(255,150,150,.4); font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.04em; cursor:pointer; transition:all .2s; }
+#coll-delete-all-btn:hover { border-color:rgba(255,107,107,.38); background:rgba(255,107,107,.08); color:rgba(255,150,150,.85); }
+
+/* COLLECTOR */
+#collector { position:fixed; inset:0; z-index:50; background:rgba(2,5,9,.97); backdrop-filter:blur(30px); transform:translateY(100%); transition:transform .7s cubic-bezier(.16,1,.3,1); overflow-y:auto; }
+#collector.open { transform:translateY(0); }
+#coll-header { position:sticky; top:0; z-index:2; padding:36px 36px 20px; background:linear-gradient(180deg,rgba(2,5,9,1) 72%,rgba(2,5,9,0) 100%); display:flex; align-items:flex-end; justify-content:space-between; gap:20px; }
+#coll-title { font-family:'Playfair Display',serif; font-size:3.2rem; font-style:italic; color:var(--pearl); letter-spacing:-.01em; line-height:1; }
+#coll-stats { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:500; letter-spacing:.12em; color:rgba(220,232,245,.38); text-align:right; line-height:2; text-transform:uppercase; padding-bottom:4px; }
+#coll-close { position:fixed; top:28px; right:30px; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.06); border:1px solid var(--border2); color:var(--pearl); font-size:1rem; cursor:pointer; z-index:60; display:flex; align-items:center; justify-content:center; transition:all .2s; pointer-events:all; }
+#coll-close:hover { background:rgba(255,107,107,.15); color:var(--coral); }
+#coll-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:14px; padding:0 36px 60px; }
+.country-card { border-radius:10px; overflow:hidden; background:rgba(5,10,22,.95); border:1px solid rgba(255,255,255,.06); cursor:pointer; transition:transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s, border-color .35s; position:relative; }
+.country-card:hover { transform:translateY(-5px); box-shadow:0 20px 48px rgba(0,0,0,.6); border-color:rgba(255,255,255,.12); }
+.country-card::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:2px; background:var(--cont, rgba(0,229,200,.6)); transition:width .5s cubic-bezier(.16,1,.3,1); pointer-events:none; z-index:3; }
+.country-card:hover::after { width:100%; }
+.card-shine { display:none; }
+.card-hero { height:136px; position:relative; overflow:hidden; background:#060c1a; }
+.card-flag-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; opacity:1; transition:opacity .35s; pointer-events:none; display:block; }
+.country-card:hover .card-flag-bg { opacity:1; }
+.card-hero-vignette { display:none; }
+.card-hero-bar { height:3px; background:var(--cont, rgba(0,229,200,.6)); width:100%; flex-shrink:0; }
+.card-flag { display:none; }
+.card-body { padding:14px 14px 12px; display:flex; flex-direction:column; gap:0; box-sizing:border-box; }
+.card-name { font-family:'Playfair Display',serif; font-size:1rem; font-weight:400; line-height:1.2; margin-bottom:3px; }
+.card-region { font-family:'Syne',sans-serif; font-size:0.58rem; font-weight:600; letter-spacing:.12em; color:var(--cont,var(--aqua)); text-transform:uppercase; margin-bottom:10px; opacity:1; }
+.card-divider { height:1px; background:linear-gradient(to right, var(--cont,rgba(0,229,200,.5)) 0%, transparent 100%); margin-bottom:10px; opacity:0.5; }
+.card-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px 6px; margin-bottom:10px; }
+.card-stat { display:flex; flex-direction:column; gap:2px; text-align:left; }
+.card-lbl { font-family:'Syne',sans-serif; font-size:0.54rem; font-weight:500; letter-spacing:.08em; color:rgba(220,232,245,.35); text-transform:uppercase; text-align:left; }
+.card-val { font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:400; color:rgba(220,232,245,.85); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
+.card-badge { display:none; }
+.card-empty { border-radius:15px; border:1px dashed rgba(255,255,255,.05); height:215px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+.card-empty-icon { font-size:1.8rem; opacity:.18; }
+.card-empty-text { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:400; letter-spacing:.1em; color:rgba(220,232,245,.25); text-transform:uppercase; }
+@keyframes cardPop { 0%{transform:translateY(14px) scale(.96);opacity:0} 100%{transform:translateY(0) scale(1);opacity:1} }
+.card-new { animation:cardPop .65s cubic-bezier(.16,1,.3,1) both; }
+
+/* COLLECTION SORT BAR */
+#coll-sort-bar { display:flex; align-items:center; gap:8px; padding:0 36px 18px; }
+#coll-sort-label { font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.08em; color:rgba(220,232,245,.38); margin-right:4px; }
+.coll-sort-btn { padding:8px 18px; border-radius:9px; border:1px solid rgba(255,255,255,.09); background:transparent; color:rgba(220,232,245,.45); font-family:'Syne',sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:.04em; cursor:pointer; transition:all .2s; }
+.coll-sort-btn:hover { border-color:rgba(255,255,255,.2); color:var(--pearl); background:rgba(255,255,255,.04); }
+.coll-sort-btn.active { background:rgba(0,229,200,.12); border-color:rgba(0,229,200,.3); color:var(--aqua); }
+#coll-select-btn { margin-left:auto; padding:8px 16px; border-radius:9px; border:1px solid rgba(255,255,255,.1); background:transparent; color:rgba(220,232,245,.4); font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:.04em; cursor:pointer; transition:all .2s; }
+#coll-select-btn:hover { border-color:rgba(255,255,255,.22); color:rgba(220,232,245,.8); background:rgba(255,255,255,.04); }
+
+/* CONTINENT ACCENT — driven by --cont CSS variable set per-card in JS */
+
+/* LEFT PANEL — holds nav hints + control buttons */
+#left-panel { position:fixed; left:20px; bottom:24px; z-index:20; display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+#nav-hint { pointer-events:none; opacity:.5; padding:0 4px; }
+#nav-hint p { font-family:'Syne',sans-serif; font-size:0.7rem; font-weight:400; letter-spacing:.04em; color:rgba(220,232,245,.45); line-height:2; }
+#left-btns { display:flex; flex-direction:column; gap:3px; background:rgba(3,8,18,.84); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:8px; backdrop-filter:blur(24px); box-shadow:0 8px 32px rgba(0,0,0,.4); }
+.btn-sep { height:1px; background:rgba(255,255,255,.06); margin:3px 2px; border:none; display:block; }
+
+/* Shared base for all left-panel buttons */
+#open-coll, #rot-btn, #geo-btn, #hint-btn, #label-btn {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border-radius:10px;
+  min-width:154px; width:100%; text-align:left;
+  cursor:pointer; pointer-events:all;
+  transition:all .2s;
+  font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:500; letter-spacing:.02em;
+  white-space:nowrap; backdrop-filter:none;
+}
+
+#open-coll { border:1px solid rgba(255,196,107,.16); background:rgba(255,196,107,.05); color:rgba(220,232,245,.75); }
+#open-coll:hover { border-color:rgba(255,196,107,.38); background:rgba(255,196,107,.11); color:var(--gold); }
+.btn-ico { flex-shrink:0; display:block; }
+#coll-count { background:rgba(255,196,107,.15); color:var(--gold); border:1px solid rgba(255,196,107,.28); min-width:22px; height:17px; border-radius:4px; font-family:'Syne',sans-serif; font-size:0.62rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-left:auto; padding:0 5px; line-height:1; letter-spacing:.02em; }
+
+#hint-btn { border:1px solid rgba(255,196,107,.2); background:rgba(255,196,107,.07); color:var(--gold); }
+#hint-btn:hover { border-color:rgba(255,196,107,.5); background:rgba(255,196,107,.14); }
+
+#rot-btn { border:1px solid rgba(255,255,255,.07); background:transparent; color:rgba(220,232,245,.52); }
+#rot-btn:hover { border-color:rgba(0,229,200,.3); color:var(--aqua); background:rgba(0,229,200,.06); }
+
+#geo-btn { border:1px solid rgba(255,255,255,.07); background:transparent; color:rgba(220,232,245,.52); }
+#geo-btn:hover { border-color:rgba(255,255,255,.2); color:var(--pearl); background:rgba(255,255,255,.04); }
+
+#label-btn { border:1px solid rgba(255,255,255,.07); background:transparent; color:rgba(220,232,245,.52); }
+#label-btn:hover { border-color:rgba(255,255,255,.2); color:var(--pearl); background:rgba(255,255,255,.04); }
+
+/* HOVER LABEL (replaces floating tip) */
+#hover-label { position:fixed; top:24px; right:30px; margin-top:78px; min-width:200px; padding:14px 20px; border-radius:14px; background:rgba(3,8,18,.88); border:1px solid rgba(255,255,255,.1); backdrop-filter:blur(24px); z-index:20; pointer-events:none; transition:opacity .25s; box-shadow:0 4px 24px rgba(0,0,0,.35); }
+#tip-name { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--pearl); line-height:1.2; }
+#tip-sub { margin-top:5px; font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:500; letter-spacing:.1em; color:var(--aqua); text-transform:uppercase; opacity:.8; }
+#tip-name .flag-img { width:1.3em; height:0.95em; vertical-align:-0.14em; }
+
+/* BURST */
+#burst { position:fixed; inset:0; pointer-events:none; z-index:45; display:none; align-items:center; justify-content:center; }
+#burst.show { display:flex; }
+.burst-ring { position:absolute; width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); animation:burstR .8s ease-out forwards; }
+@keyframes burstR { 0%{transform:scale(0);opacity:.9} 100%{transform:scale(4);opacity:0} }
+#burst-text { font-family:'Playfair Display',serif; font-size:1.3rem; font-style:italic; color:var(--gold); animation:burstT .9s ease-out forwards; z-index:1; }
+@keyframes burstT { 0%{transform:scale(.4);opacity:0} 40%{opacity:1;transform:scale(1.08)} 100%{transform:scale(1);opacity:0} }
+
+/* HINT */
+#hint-layer { position:fixed; inset:0; z-index:18; pointer-events:none; overflow:hidden; }
+.hint-ring { position:absolute; border-radius:50%; border:1px solid rgba(255,196,107,.65); box-shadow:0 0 20px rgba(255,196,107,.18), inset 0 0 14px rgba(255,196,107,.12); transform:translate(-50%,-50%); animation:hintConverge 1.5s ease-out infinite; }
+.hint-ring.r1 { width:42px; height:42px; }
+.hint-ring.r2 { width:70px; height:70px; animation-delay:.18s; }
+.hint-ring.r3 { width:102px; height:102px; animation-delay:.36s; }
+.hint-label { position:absolute; transform:translate(-50%,calc(-50% - 78px)); font-family:'Syne',sans-serif; font-size:0.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); background:rgba(8,16,28,.82); border:1px solid rgba(255,196,107,.35); padding:7px 16px; border-radius:24px; backdrop-filter:blur(12px); white-space:nowrap; pointer-events:none; animation:fadeIn .5s ease both; box-shadow:0 6px 20px rgba(0,0,0,.4); }
+@keyframes hintConverge { 0%{transform:translate(-50%,-50%) scale(1.9); opacity:0} 18%{opacity:1} 100%{transform:translate(-50%,-50%) scale(.55); opacity:0} }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+/* INTRO */
+#intro { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; flex-direction:column; background:radial-gradient(ellipse at 40% 50%,#08152a 0%,#020509 70%); transition:opacity .8s,visibility .8s; }
+#intro.gone { opacity:0; visibility:hidden; }
+#intro h2 { font-family:'Playfair Display',serif; font-size:clamp(3.5rem,10vw,8rem); font-style:italic; background:linear-gradient(135deg,var(--pearl) 30%,var(--aqua)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:6px; animation:fadeUp 1.2s ease; }
+#intro p.sub { font-family:'Syne',sans-serif; font-size:.66rem; letter-spacing:.5em; color:var(--mist); text-transform:uppercase; margin-bottom:44px; animation:fadeUp 1.2s .18s ease both; }
+#intro p.desc { font-size:.88rem; color:var(--mist); max-width:360px; text-align:center; line-height:1.75; margin-bottom:44px; animation:fadeUp 1.2s .3s ease both; }
+#intro-btn { padding:16px 52px; border-radius:14px; border:1px solid rgba(0,229,200,.4); background:transparent; color:var(--aqua); font-family:'Syne',sans-serif; font-size:0.85rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; position:relative; overflow:hidden; transition:color .4s; animation:fadeUp 1.2s .4s ease both; }
+#intro-btn::before { content:''; position:absolute; inset:0; background:var(--aqua); transform:translateX(-101%); transition:transform .4s cubic-bezier(.16,1,.3,1); z-index:-1; }
+#intro-btn:hover::before { transform:translateX(0); }
+#intro-btn:hover { color:var(--ink); }
+
+/* LOADING */
+#loading { position:fixed; inset:0; z-index:70; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px; background:var(--ink); transition:opacity .6s; }
+#loading.gone { opacity:0; pointer-events:none; }
+.spin { width:46px; height:46px; border-radius:50%; border:1px solid rgba(0,229,200,.12); border-top-color:var(--aqua); animation:rot 1s linear infinite; }
+@keyframes rot { to{transform:rotate(360deg)} }
+#loading p { font-family:'Syne',sans-serif; font-size:.56rem; letter-spacing:.35em; color:var(--mist); }
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spin"></div><p id="load-msg">Initializing globe…</p></div>
+<div id="starfield"></div>
+<canvas id="three-canvas"></canvas>
+<div id="hint-layer"></div>
+
+<div id="logo"><h1>TER<em>RA</em></h1><p>World Explorer</p></div>
+
+<div id="tabs">
+  <button class="tab active" onclick="setMode('find',this)">Find Country</button>
+  <button class="tab" onclick="setMode('flag',this)">By Flag</button>
+  <button class="tab" onclick="setMode('capital',this)">By Capital</button>
+  <button class="tab" onclick="setMode('continent',this)">By Continent</button>
+  <button class="tab" onclick="setMode('shape',this)">By Shape</button>
+  <button class="tab" onclick="setMode('explore',this)">Explore</button>
+</div>
+
+<div id="scorebox">
+  <div id="score-num">0 <span>/</span> 0</div>
+  <div id="score-pct"></div>
+  <div id="streak-tag">STREAK — 0</div>
+</div>
+<div id="hover-label">
+  <div id="tip-name">—</div>
+  <div id="tip-sub"></div>
+</div>
+
+<div id="challenge-wrap">
+  <div id="chal-label">Find on the globe</div>
+  <div id="chal-flag"></div>
+  <div id="chal-shape">
+    <div id="chal-shape-inner"></div>
+  </div>
+  <div id="chal-text">—</div>
+  <div id="dbl-hint">⊙ Double-click to select</div>
+</div>
+
+<button id="next-btn" onclick="nextQ()">Next →</button>
+<button id="skip-btn" onclick="skipQ()">Skip ⏭</button>
+
+<div id="left-panel">
+  <div id="nav-hint">
+    <p>⟵ Drag to rotate</p>
+    <p>⊕ Scroll to zoom</p>
+    <p>◎ Double-click to select</p>
+  </div>
+  <div id="left-btns">
+    <button id="open-coll" onclick="openCollector()">
+      <svg class="btn-ico" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5L7 12l5.5-2.5"/><path d="M1.5 7L7 9.5 12.5 7"/><path d="M1.5 4.5L7 7l5.5-2.5L7 2z"/></svg>
+      <span class="btn-lbl">Collection</span>
+      <div id="coll-count">0</div>
+    </button>
+    <hr class="btn-sep">
+    <button id="rot-btn" onclick="toggleRotation()">
+      <svg class="btn-ico" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.8 2.5A6 6 0 1 0 13 7"/><polyline points="13,1 13,4 10,4"/></svg>
+      <span class="btn-lbl">Rotation: On</span>
+    </button>
+    <button id="geo-btn" onclick="toggleGeoLines()">
+      <svg class="btn-ico" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/><circle cx="7" cy="7" r="3.5"/><circle cx="7" cy="7" r="6"/><line x1="7" y1="7" x2="10.8" y2="3.2" opacity=".5"/></svg>
+      <span class="btn-lbl">Geo Lines: On</span>
+    </button>
+    <button id="label-btn" onclick="toggleHoverLabel()">
+      <svg class="btn-ico" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2.5" y1="1.5" x2="2.5" y2="12.5"/><path d="M2.5 1.5L11.5 4.5 2.5 7.5z"/></svg>
+      <span class="btn-lbl">Label: On</span>
+    </button>
+    <hr class="btn-sep">
+    <button id="hint-btn" onclick="useHint()">
+      <svg class="btn-ico" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9.5c0-1.3-1.1-2.1-1.6-3.3a3.6 3.6 0 1 1 7.2 0C10.1 7.4 9 8.2 9 9.5H5z"/><line x1="5" y1="11" x2="9" y2="11"/><line x1="5.5" y1="12.5" x2="8.5" y2="12.5"/></svg>
+      <span class="btn-lbl">Use Hint</span>
+    </button>
+  </div>
+</div>
+
+<div id="explore-modal" onclick="if(event.target===this)closeExplore()">
+  <div id="explore-card">
+    <div id="explore-hero">
+      <div id="explore-hero-bg"></div>
+      <div id="explore-flag">🌍</div>
+      <div id="explore-titlebox">
+        <div id="explore-name">—</div>
+        <div id="explore-region">—</div>
+      </div>
+      <button id="explore-close" onclick="closeExplore()" aria-label="Close">✕</button>
+    </div>
+    <div id="explore-body">
+      <div>
+        <div id="explore-facts-ttl">✦ What makes it interesting</div>
+        <div id="explore-facts"></div>
+      </div>
+      <div>
+        <div id="explore-shape-wrap">
+          <div id="explore-shape"></div>
+          <div id="explore-shape-caption">Country outline</div>
+        </div>
+        <div id="explore-stats"></div>
+      </div>
+      <div id="explore-actions">
+        <button id="explore-collect-btn" onclick="collectFromExplore()">✦ Add to Collection</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="feedback"><div id="fb-inner">
+  <div id="fb-icon">✦</div>
+  <div id="fb-text">Correct!</div>
+</div></div>
+
+<div id="burst">
+  <div class="burst-ring"></div>
+  <div class="burst-ring" style="animation-delay:.12s"></div>
+  <div id="burst-text">✦ Collected!</div>
+</div>
+
+<div id="collector">
+  <div id="coll-header">
+    <div id="coll-title">My Collection</div>
+    <div id="coll-stats"></div>
+  </div>
+  <button id="coll-close" onclick="closeCollector()">✕</button>
+  <div id="coll-sort-bar">
+    <span id="coll-sort-label">Sort by</span>
+    <button class="coll-sort-btn active" id="sort-continent-btn" onclick="setCollSort('continent')">Continent</button>
+    <button class="coll-sort-btn" id="sort-alpha-btn" onclick="setCollSort('alpha')">A–Z</button>
+    <button id="coll-select-btn" onclick="enterSelectMode()">Select</button>
+    <div id="coll-select-actions">
+      <span id="coll-select-count">0 selected</span>
+      <button id="coll-done-btn" onclick="exitSelectMode()">Done</button>
+      <button id="coll-delete-sel-btn" onclick="deleteSelected()" disabled>Delete selected</button>
+      <button id="coll-delete-all-btn" onclick="deleteAll()">Delete all</button>
+    </div>
+  </div>
+  <div id="coll-grid"></div>
+</div>
+
+<div id="continent-picker">
+  <div id="continent-card">
+    <div id="continent-title">Choose a continent</div>
+    <div id="continent-desc">The globe will lock onto that region</div>
+    <div id="continent-grid">
+      <button class="continent-btn" onclick="chooseContinent('Africa')"><strong>Africa</strong><span>54 countries</span></button>
+      <button class="continent-btn" onclick="chooseContinent('Asia')"><strong>Asia</strong><span>largest landmass</span></button>
+      <button class="continent-btn" onclick="chooseContinent('Europe')"><strong>Europe</strong><span>dense with nations</span></button>
+      <button class="continent-btn" onclick="chooseContinent('America')"><strong>America</strong><span>north and south together</span></button>
+      <button class="continent-btn" onclick="chooseContinent('Oceania')"><strong>Oceania</strong><span>islands and Australia</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="intro">
+  <h2>Terra</h2>
+  <p class="sub">World Explorer</p>
+  <p class="desc">Spin the globe. Learn every country on Earth. Build your ultimate collection of nations.</p>
+  <button id="intro-btn" onclick="beginJourney()">Begin Journey</button>
+</div>
+
+<!-- Three.js r128 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="data/countries-data.js"></script>
+
+<script>
+'use strict';
+
+// ── STARS ─────────────────────────────────────────────────────────────
+(()=>{
+  const sf=document.getElementById('starfield');
+  for(let i=0;i<260;i++){
+    const s=document.createElement('div'); s.className='star';
+    const z=Math.random()*1.6+.3;
+    s.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--dl:${(Math.random()*5).toFixed(1)}s;--o:${(Math.random()*.65+.1).toFixed(2)};`;
+    sf.appendChild(s);
+  }
+})();
+
+const loadMsg = document.getElementById('load-msg');
+
+// ── THREE SETUP ───────────────────────────────────────────────────────
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.75;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 1000);
+camera.position.z = 2.7;
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  buildBorderCanvas();
+});
+
+// ── LIGHTING ──────────────────────────────────────────────────────────
+// Soft ambient — enough to see the night side without washing out texture
+scene.add(new THREE.AmbientLight(0x2a3a5a, 1.0));
+// Sun: much lower intensity so texture stays readable, not blown out
+const sun = new THREE.DirectionalLight(0xffeedd, 1.4);
+sun.position.set(5, 2, 5); scene.add(sun);
+// Subtle cool fill from the other side
+const fill = new THREE.DirectionalLight(0x112244, 0.25);
+fill.position.set(-5, -1, -4); scene.add(fill);
+
+// ── EARTH SPHERE ──────────────────────────────────────────────────────
+const RADIUS = 1.0;
+const earthGeo = new THREE.SphereGeometry(RADIUS, 80, 80);
+
+// Phong material — will receive the texture
+const earthMat = new THREE.MeshPhongMaterial({
+  shininess: 6,
+  specular: new THREE.Color(0x0a1a33),
+  bumpScale: 0.005,
+});
+
+const earth = new THREE.Mesh(earthGeo, earthMat);
+// Default rotation order ('XYZ') is correct for our look-at math. Three.js's
+// intrinsic XYZ produces matrix M = Rx(rotX) * Ry(rotY), which when applied to
+// a point on the sphere applies Ry first (longitude swing) and then Rx
+// (latitude tilt) — exactly what spinTo / useHint assume.
+scene.add(earth);
+
+// ── ATMOSPHERE ────────────────────────────────────────────────────────
+// Shared vertex shader for both atmosphere layers
+const atmVert = `varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+
+// Outer halo — wide, very soft blue glow
+const atmOuter = new THREE.ShaderMaterial({
+  transparent:true, side:THREE.BackSide, depthWrite:false,
+  vertexShader: atmVert,
+  fragmentShader:`varying vec3 vN;void main(){
+    float rim=1.-abs(dot(vN,vec3(0.,0.,1.)));
+    float i=pow(rim,4.5);
+    gl_FragColor=vec4(0.04,0.42,0.88,i*0.14);
+  }`
+});
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(RADIUS*1.08,80,80), atmOuter));
+
+
+// ── BORDER CANVAS OVERLAY ─────────────────────────────────────────────
+// We paint country borders + hover fill onto a canvas texture
+const BORD_SIZE = 4096;
+const bordCanvas = document.createElement('canvas');
+bordCanvas.width = bordCanvas.height = BORD_SIZE;
+const bordCtx = bordCanvas.getContext('2d');
+
+const bordTex = new THREE.CanvasTexture(bordCanvas);
+bordTex.needsUpdate = true;
+
+const bordMat = new THREE.MeshBasicMaterial({
+  map: bordTex,
+  transparent: true,
+  opacity: 0.92,
+  depthWrite: false,
+  blending: THREE.NormalBlending,
+});
+const bordMesh = new THREE.Mesh(new THREE.SphereGeometry(RADIUS*1.002,80,80), bordMat);
+scene.add(bordMesh);
+
+// ── GEO HELPERS ───────────────────────────────────────────────────────
+function geoToUV(lon, lat) {
+  // lon: -180..180 → u: 0..1, lat: -90..90 → v: 0..1 (top=90)
+  const u = (lon + 180) / 360;
+  const v = (90 - lat) / 180;
+  return [u * BORD_SIZE, v * BORD_SIZE];
+}
+
+// Draw one ring/polygon of [lon,lat] pairs
+function drawRing(ctx, ring) {
+  if (!ring || ring.length < 2) return;
+  ctx.moveTo(...geoToUV(ring[0][0], ring[0][1]));
+  for (let i = 1; i < ring.length; i++) ctx.lineTo(...geoToUV(ring[i][0], ring[i][1]));
+  ctx.closePath();
+}
+
+function drawFeature(ctx, geom) {
+  if (!geom) return;
+  ctx.beginPath();
+  if (geom.type === 'Polygon') {
+    geom.coordinates.forEach(r => drawRing(ctx, r));
+  } else if (geom.type === 'MultiPolygon') {
+    geom.coordinates.forEach(poly => poly.forEach(r => drawRing(ctx, r)));
+  }
+}
+
+// ── GEOJSON LOAD ──────────────────────────────────────────────────────
+let geoData = null;
+let hoveredISO = null;
+let hoveredFeature = null;
+let hoveredFeatureKey = null;
+let correctISO = null;
+let wrongISO = null;
+let showGeoLines = true;
+
+function getFeatureISO(feature) {
+  const p = feature?.properties || {};
+  const raw = [
+    p.ISO_A3,
+    p.iso_a3,
+    p.ADM0_A3,
+    p.ADM0_A3_US,
+    p.SOV_A3,
+    p.BRK_A3,
+    p['ISO3166-1-Alpha-3'],   // datasets/geo-countries format
+  ].find(v => v && v !== '-99' && v !== 'N/A');
+  return raw || '';
+}
+
+function getFeatureCodes(feature) {
+  const p = feature?.properties || {};
+  return [
+    p.ISO_A3, p.iso_a3, p.ADM0_A3, p.ADM0_A3_US, p.SOV_A3, p.BRK_A3,
+    p.ISO_A2, p.iso_a2,
+    p['ISO3166-1-Alpha-3'],   // datasets/geo-countries format
+    p['ISO3166-1-Alpha-2'],
+  ].map(v => (v || '').toString().trim()).filter(v => v && v !== '-99' && v !== 'N/A');
+}
+
+function getFeatureKey(feature) {
+  const p = feature?.properties || {};
+  return [
+    ...getFeatureCodes(feature),
+    p.ADMIN || '',
+    p.name || '',
+    p.NAME || '',
+    feature?.geometry?.type || '',
+  ].join('|');
+}
+
+function findFeatureByCode(code3) {
+  if (!geoData || !code3) return null;
+  const target = normalizeCountryName(code3);
+  return geoData.features.find(f =>
+    getFeatureCodes(f).some(v => normalizeCountryName(v) === target) ||
+    countryNamesMatch({name: code3, code3}, {
+      name: f.properties?.ADMIN || f.properties?.name || f.properties?.NAME || '',
+      code3: getFeatureISO(f),
+    })
+  ) || null;
+}
+
+function buildBorderCanvas() {
+  if (!geoData) return;
+  bordCtx.clearRect(0, 0, BORD_SIZE, BORD_SIZE);
+  bordCtx.lineJoin = 'round';
+  bordCtx.lineCap = 'round';
+  bordCtx.globalCompositeOperation = 'source-over';
+
+  const hoverFeature = hoveredFeature;
+  const correctFeature = findFeatureByCode(correctISO);
+  const wrongFeature = findFeatureByCode(wrongISO);
+  const collectedSet = new Set(collection.map(c => c.code3));
+
+  geoData.features.forEach(f => {
+    const iso = getFeatureISO(f);
+    const isCorrect   = iso === correctISO;
+    const isWrong     = iso === wrongISO;
+    const isCollected = collectedSet.has(iso);
+
+    drawFeatureState(f, isCorrect ? 'correct' : isWrong ? 'wrong' : isCollected ? 'collected' : 'base');
+  });
+
+  if (hoverFeature && hoverFeature !== correctFeature && hoverFeature !== wrongFeature) {
+    drawFeatureState(hoverFeature, 'hover-glow');
+    drawFeatureState(hoverFeature, 'hover');
+  }
+
+  bordTex.needsUpdate = true;
+}
+
+function drawFeatureState(f, state) {
+  bordCtx.save();
+  drawFeature(bordCtx, f.geometry);
+  if (state === 'correct') {
+    bordCtx.fillStyle = 'rgba(0,220,190,0.22)';
+    bordCtx.fill('evenodd');
+    bordCtx.strokeStyle = 'rgba(0,255,200,0.72)';
+    bordCtx.lineWidth = 2.4;
+  } else if (state === 'wrong') {
+    bordCtx.fillStyle = 'rgba(255,80,80,0.2)';
+    bordCtx.fill('evenodd');
+    bordCtx.strokeStyle = 'rgba(255,90,90,0.72)';
+    bordCtx.lineWidth = 2.2;
+  } else if (state === 'hover') {
+    bordCtx.fillStyle = 'rgba(0,229,200,0.32)';
+    bordCtx.fill('evenodd');
+    bordCtx.shadowColor = 'rgba(0,229,200,1)';
+    bordCtx.shadowBlur = 24;
+    bordCtx.strokeStyle = 'rgba(180,255,240,0.95)';
+    bordCtx.lineWidth = 3.5;
+  } else if (state === 'hover-glow') {
+    bordCtx.fillStyle = 'rgba(0,229,200,0.10)';
+    bordCtx.fill('evenodd');
+    bordCtx.shadowColor = 'rgba(0,229,200,1)';
+    bordCtx.shadowBlur = 30;
+    bordCtx.strokeStyle = 'rgba(0,229,200,0.45)';
+    bordCtx.lineWidth = 7;
+  } else if (state === 'collected') {
+    bordCtx.fillStyle = 'rgba(0,229,200,0.28)';
+    bordCtx.fill('evenodd');
+    bordCtx.strokeStyle = 'rgba(0,255,210,0.9)';
+    bordCtx.lineWidth = 2.8;
+  } else {
+    if (showGeoLines) {
+      bordCtx.strokeStyle = 'rgba(255,255,255,0.68)';
+      bordCtx.lineWidth = 0.7;
+    } else {
+      bordCtx.strokeStyle = 'rgba(255,255,255,0.0)';
+      bordCtx.lineWidth = 0.01;
+    }
+  }
+  bordCtx.stroke();
+  bordCtx.restore();
+}
+
+// ── LOAD EARTH TEXTURE + GEOJSON ─────────────────────────────────────
+const texLoader = new THREE.TextureLoader();
+
+loadMsg.textContent = 'Loading Earth texture…';
+
+// Use a reliable CORS-friendly NASA tile
+texLoader.load(
+  'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+  tex => {
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    earthMat.map = tex;
+    earthMat.needsUpdate = true;
+    loadMsg.textContent = 'Loading country borders…';
+    loadGeoJSON();
+  },
+  undefined,
+  () => {
+    // fallback texture source
+    texLoader.load(
+      'https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg',
+      tex => {
+        tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        earthMat.map = tex;
+        earthMat.needsUpdate = true;
+        loadGeoJSON();
+      },
+      undefined,
+      () => {
+        // second fallback — procedural ocean/land
+        earthMat.color = new THREE.Color(0x0d3060);
+        earthMat.needsUpdate = true;
+        loadGeoJSON();
+      }
+    );
+  }
+);
+
+function loadGeoJSON() {
+  loadMsg.textContent = 'Loading country borders…';
+  fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+    .then(r => r.json())
+    .then(data => {
+      geoData = data;
+      buildBorderCanvas();
+      geoReady = true;
+      loadMsg.textContent = 'Ready!';
+      maybeFinishLoading();
+    })
+    .catch(() => {
+      // fallback GeoJSON source
+      fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+        .then(r => r.json())
+        .then(topo => {
+          // Convert topojson to simple GeoJSON-like
+          loadMsg.textContent = 'Ready (simplified borders)';
+          geoReady = true;
+          maybeFinishLoading();
+        })
+        .catch(() => {
+          loadMsg.textContent = 'Ready (no borders loaded)';
+          geoReady = true;
+          maybeFinishLoading();
+        });
+    });
+}
+
+// ── ROTATION STATE ────────────────────────────────────────────────────
+// DRAG_TILT_LIMIT caps how far the user can tip the globe via dragging.
+// 1.3 rad ≈ 74°: lets you reach Norway, Scandinavia, and Antarctica while
+// stopping just short of a full pole-flip. Soft resistance near the limit
+// makes the edge feel natural rather than a hard wall.
+const DRAG_TILT_LIMIT = 1.3;
+let rotX = 0.15, rotY = 0;
+let targetRotX = 0.15, targetRotY = 0;
+let isDrag = false, dragStart = {x:0,y:0};
+let dragDist = 0; // track total drag distance to distinguish click vs drag
+let autoSpin = true;
+let rotationEnabled = true;
+let camZ = 2.7, targetCamZ = 2.7;
+let viewLocked = false;
+
+// ── INTERACTION ───────────────────────────────────────────────────────
+let clickCountry = null; // country detected at mousedown, before any drag rotation
+
+function resolveClickedCountry(px, py) {
+  // Prefer the captured mousedown country, then raycast the current pointer.
+  // Hover state can be stale between rounds, so keep it out of selection logic.
+  return clickCountry || getCountryAtScreen(px, py);
+}
+
+canvas.addEventListener('mousedown', e => {
+  isDrag = true;
+  dragDist = 0;
+  dragStart = {x:e.clientX, y:e.clientY};
+  // Capture the country under the cursor NOW, before drag can shift the globe
+  clickCountry = getCountryAtScreen(e.clientX, e.clientY);
+});
+
+window.addEventListener('mousemove', e => {
+  if (isDrag) {
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    dragDist += Math.abs(dx) + Math.abs(dy);
+    // Spin freely around the polar (Y) axis. Apply soft resistance on tilt
+    // so the globe gets progressively harder to push near the pole limit
+    // instead of hitting a hard wall.
+    targetRotY += dx * 0.005;
+    const tiltScale = Math.max(0.05, 1 - Math.pow(Math.abs(targetRotX) / DRAG_TILT_LIMIT, 3));
+    targetRotX += dy * 0.0022 * tiltScale;
+    targetRotX = Math.max(-DRAG_TILT_LIMIT, Math.min(DRAG_TILT_LIMIT, targetRotX));
+    dragStart = {x:e.clientX, y:e.clientY};
+  } else {
+    handleHover(e.clientX, e.clientY);
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  isDrag = false;
+});
+
+canvas.addEventListener('wheel', e => {
+  targetCamZ = Math.max(1.35, Math.min(5.5, targetCamZ + e.deltaY * 0.003));
+  e.preventDefault();
+}, {passive:false});
+
+// ── DOUBLE-CLICK SELECT ───────────────────────────────────────────────
+canvas.addEventListener('dblclick', e => {
+  isDrag = false;
+  dragDist = 0;
+
+  const country = resolveClickedCountry(e.clientX, e.clientY);
+  clickCountry = null;
+
+  if (country) {
+    hoveredISO = country.code3;
+    buildBorderCanvas();
+    handleSelect(country);
+  }
+  e.preventDefault();
+  e.stopPropagation();
+});
+
+// Touch
+let touchA = null;
+canvas.addEventListener('touchstart', e => {
+  touchA = {x:e.touches[0].clientX, y:e.touches[0].clientY, t:Date.now()};
+  isDrag = true; dragDist = 0; dragStart = {x:touchA.x, y:touchA.y};
+}, {passive:true});
+window.addEventListener('touchmove', e => {
+  if (!isDrag) return;
+  const dx = e.touches[0].clientX - dragStart.x;
+  const dy = e.touches[0].clientY - dragStart.y;
+  dragDist += Math.abs(dx) + Math.abs(dy);
+  targetRotY += dx * 0.005;
+  const tiltScaleT = Math.max(0.05, 1 - Math.pow(Math.abs(targetRotX) / DRAG_TILT_LIMIT, 3));
+  targetRotX += dy * 0.0022 * tiltScaleT;
+  targetRotX = Math.max(-DRAG_TILT_LIMIT, Math.min(DRAG_TILT_LIMIT, targetRotX));
+  dragStart = {x:e.touches[0].clientX, y:e.touches[0].clientY};
+}, {passive:true});
+let lastTap = 0;
+canvas.addEventListener('touchend', e => {
+  isDrag = false;
+  const now = Date.now();
+  if (now - lastTap < 320 && touchA && dragDist < 8) {
+    const country = getCountryAtScreen(touchA.x, touchA.y);
+    if (country) handleSelect(country);
+  }
+  lastTap = now;
+});
+
+// ── RAYCASTING & ISO LOOKUP ───────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const mouse2 = new THREE.Vector2();
+
+function getHitLatLon(px, py) {
+  mouse2.set((px/innerWidth)*2-1, -(py/innerHeight)*2+1);
+  raycaster.setFromCamera(mouse2, camera);
+  const hits = raycaster.intersectObject(earth);
+  if (!hits.length) return null;
+  // Unproject from world space back through earth's rotation
+  const localPt = hits[0].point.clone().applyQuaternion(
+    earth.quaternion.clone().invert()
+  ).normalize();
+  const lat = THREE.MathUtils.radToDeg(Math.asin(Math.max(-1,Math.min(1,localPt.y))));
+  // In Three.js SphereGeometry, east (+lon) maps to the -z axis, so negate z before atan2
+  const lon = THREE.MathUtils.radToDeg(Math.atan2(-localPt.z, localPt.x));
+  return {lat, lon};
+}
+
+function getCountryAtScreen(px, py) {
+  if (!geoData) return null;
+  const ll = getHitLatLon(px, py);
+  if (!ll) return null;
+  return getCountryByLatLon(ll.lat, ll.lon);
+}
+
+function normalizeCountryName(value) {
+  let s = (value || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+  // Collapse "Democratic Republic of \u2026" and "Democratic People's Republic of \u2026"
+  // to a "DR" / "DPR" prefix so the two Congos and the two Koreas stay distinct
+  // from their non-democratic counterparts after stripping. Apply BEFORE generic
+  // "REPUBLIC OF" stripping below.
+  s = s
+    .replace(/^DEMOCRATICPEOPLESREPUBLICOF(?:THE)?/, 'DPR')
+    .replace(/^DEMOCRATICREPUBLICOF(?:THE)?/, 'DR');
+  // Now iteratively strip generic official-name prefixes so "Republic of the Congo"
+  // and "Congo" collapse together, while "DR Congo" stays distinct.
+  let prev;
+  do {
+    prev = s;
+    s = s
+      .replace(/^THE/, '')
+      .replace(/^REPUBLICOF/, '')
+      .replace(/^KINGDOMOF/, '')
+      .replace(/^STATEOF/, '')
+      .replace(/^UNITEDREPUBLICOF/, '')
+      .replace(/^FEDERATEDSTATESOF/, '')
+      .replace(/^FEDERATIVEREPUBLICOF/, '')
+      .replace(/^ISLAMICREPUBLICOF/, '')
+      .replace(/^PEOPLESREPUBLICOF/, '')
+      .replace(/^BOLIVARIANREPUBLICOF/, '')
+      .replace(/^PLURINATIONALSTATEOF/, '')
+      .replace(/^COMMONWEALTHOF/, '')
+      .replace(/^PRINCIPALITYOF/, '')
+      .replace(/^GRANDDUCHYOF/, '')
+      .replace(/^SULTANATEOF/, '')
+      .replace(/^ARABREPUBLICOF/, '');
+  } while (s !== prev && s.length > 2);
+  return s;
+}
+
+function countryFlagText(c) {
+  return c?.flag || '🌍';
+}
+
+function getCountryAlpha2(c) {
+  const code3 = (c?.code3 || '').toString().toUpperCase();
+  const byCode3 = COUNTRY_ALPHA2_BY_CODE3[code3];
+  if (byCode3) return byCode3;
+  return (
+    c?.alpha2 ||
+    c?.ISO_A2 ||
+    c?.iso_a2 ||
+    c?.properties?.ISO_A2 ||
+    c?.properties?.iso_a2 ||
+    c?.properties?.ISO3166_1_ALPHA2 ||
+    ''
+  ).toString().replace(/[^A-Za-z]/g, '').toLowerCase();
+}
+
+function getCountryFlagMarkup(c) {
+  if (c?.flagSvg) {
+    return `<img class="flag-img" src="${c.flagSvg}" alt="${(c?.name || 'country')} flag">`;
+  }
+  if (c?.flagPng) {
+    return `<img class="flag-img" src="${c.flagPng}" alt="${(c?.name || 'country')} flag">`;
+  }
+  const a2 = getCountryAlpha2(c);
+  const fallback = countryFlagText(c);
+  if (a2) {
+    return `<img class="flag-img" src="https://flagcdn.com/${a2}.svg" alt="${(c?.name || 'country')} flag">`;
+  }
+  return fallback;
+}
+
+const COUNTRY_ALPHA2_BY_CODE3 = {
+  // Africa
+  DZA:'dz', AGO:'ao', BEN:'bj', BWA:'bw', BFA:'bf', BDI:'bi', CMR:'cm', CPV:'cv', CAF:'cf', TCD:'td',
+  COM:'km', DJI:'dj', COD:'cd', EGY:'eg', GNQ:'gq', ERI:'er', SWZ:'sz', ETH:'et', GAB:'ga', GMB:'gm',
+  GHA:'gh', GIN:'gn', CIV:'ci', KEN:'ke', LSO:'ls', LBR:'lr', LBY:'ly', MDG:'mg', MWI:'mw', MLI:'ml',
+  MRT:'mr', MUS:'mu', MAR:'ma', MOZ:'mz', NAM:'na', NER:'ne', NGA:'ng', COG:'cg', RWA:'rw', STP:'st',
+  SEN:'sn', SYC:'sc', SLE:'sl', SOM:'so', ZAF:'za', SSD:'ss', SDN:'sd', TZA:'tz', TGO:'tg', TUN:'tn',
+  UGA:'ug', ZMB:'zm', ZWE:'zw',
+  // Asia
+  AFG:'af', ARM:'am', AZE:'az', BHR:'bh', BGD:'bd', BTN:'bt', BRN:'bn', KHM:'kh', CHN:'cn', GEO:'ge',
+  IND:'in', IDN:'id', IRN:'ir', IRQ:'iq', ISR:'il', JPN:'jp', JOR:'jo', KAZ:'kz', KWT:'kw', KGZ:'kg',
+  LAO:'la', LBN:'lb', MYS:'my', MDV:'mv', MNG:'mn', MMR:'mm', NPL:'np', PRK:'kp', OMN:'om', PAK:'pk',
+  PSE:'ps', PHL:'ph', QAT:'qa', SAU:'sa', SGP:'sg', KOR:'kr', LKA:'lk', SYR:'sy', TJK:'tj', THA:'th',
+  TLS:'tl', TKM:'tm', ARE:'ae', UZB:'uz', VNM:'vn', YEM:'ye',
+  // Europe
+  ALB:'al', AND:'ad', AUT:'at', BLR:'by', BEL:'be', BIH:'ba', BGR:'bg', HRV:'hr', CYP:'cy', CZE:'cz',
+  DNK:'dk', EST:'ee', FIN:'fi', FRA:'fr', DEU:'de', GRC:'gr', HUN:'hu', ISL:'is', IRL:'ie', ITA:'it',
+  LVA:'lv', LIE:'li', LTU:'lt', LUX:'lu', MLT:'mt', MDA:'md', MCO:'mc', MNE:'me', NLD:'nl', MKD:'mk',
+  NOR:'no', POL:'pl', PRT:'pt', ROU:'ro', RUS:'ru', SMR:'sm', SRB:'rs', SVK:'sk', SVN:'si', ESP:'es',
+  SWE:'se', CHE:'ch', TUR:'tr', UKR:'ua', GBR:'gb', VAT:'va', XKX:'xk',
+  // North & Central America
+  ATG:'ag', BHS:'bs', BRB:'bb', BLZ:'bz', CAN:'ca', CRI:'cr', CUB:'cu', DMA:'dm', DOM:'do', SLV:'sv',
+  GRD:'gd', GTM:'gt', HTI:'ht', HND:'hn', JAM:'jm', MEX:'mx', NIC:'ni', PAN:'pa', KNA:'kn', LCA:'lc',
+  VCT:'vc', TTO:'tt', USA:'us',
+  // Oceania
+  AUS:'au', FJI:'fj', KIR:'ki', MHL:'mh', FSM:'fm', NRU:'nr', NZL:'nz', PLW:'pw', PNG:'pg', WSM:'ws',
+  SLB:'sb', TON:'to', TUV:'tv', VUT:'vu',
+  // South America
+  ARG:'ar', BOL:'bo', BRA:'br', CHL:'cl', COL:'co', ECU:'ec', GUY:'gy', PRY:'py', PER:'pe', SUR:'sr',
+  URY:'uy', VEN:'ve',
+};
+
+function pointInRing(lon, lat, ring) {
+  let inside = false;
+  for (let i=0, j=ring.length-1; i<ring.length; j=i++) {
+    const xi=ring[i][0], yi=ring[i][1];
+    const xj=ring[j][0], yj=ring[j][1];
+    if (((yi>lat)!=(yj>lat))&&(lon<(xj-xi)*(lat-yi)/(yj-yi)+xi)) inside=!inside;
+  }
+  return inside;
+}
+
+function pointInFeature(lon, lat, geom) {
+  if (!geom) return false;
+  if (geom.type==='Polygon') {
+    return pointInRing(lon,lat,geom.coordinates[0]);
+  } else if (geom.type==='MultiPolygon') {
+    return geom.coordinates.some(poly=>pointInRing(lon,lat,poly[0]));
+  }
+  return false;
+}
+
+function getFeatureCenter(feature) {
+  const geom = feature?.geometry;
+  if (!geom) return null;
+  let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+  const visit = (coord) => {
+    const lon = coord[0];
+    const lat = coord[1];
+    if (Number.isFinite(lon) && Number.isFinite(lat)) {
+      minLon = Math.min(minLon, lon);
+      minLat = Math.min(minLat, lat);
+      maxLon = Math.max(maxLon, lon);
+      maxLat = Math.max(maxLat, lat);
+    }
+  };
+  if (geom.type === 'Polygon') {
+    geom.coordinates.forEach(ring => ring.forEach(visit));
+  } else if (geom.type === 'MultiPolygon') {
+    geom.coordinates.forEach(poly => poly.forEach(ring => ring.forEach(visit)));
+  }
+  if (!Number.isFinite(minLon) || !Number.isFinite(minLat)) return null;
+  return { lat: (minLat + maxLat) / 2, lon: (minLon + maxLon) / 2 };
+}
+
+function getFeatureRegion(feature) {
+  const p = feature?.properties || {};
+  return p.REGION_UN || p.CONTINENT || p.region || '';
+}
+
+function getNearestFeature(lat, lon, regionFilter='') {
+  if (!geoData) return null;
+  let best = null;
+  let bestDist = Infinity;
+  for (const f of geoData.features) {
+    if (regionFilter && getFeatureRegion(f) !== regionFilter) continue;
+    const center = getFeatureCenter(f);
+    if (!center) continue;
+    let dLon = center.lon - lon;
+    if (dLon > 180) dLon -= 360;
+    if (dLon < -180) dLon += 360;
+    const dLat = center.lat - lat;
+    const dist = Math.hypot(dLon, dLat);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = f;
+    }
+  }
+  const threshold = regionFilter === 'Africa' ? 5.5 : 3.5;
+  return bestDist <= threshold ? best : null;
+}
+
+function getFocusTarget(c) {
+  const feature = c?.feature || findFeatureByCode(c?.code3);
+  const center = getFeatureCenter(feature);
+  if (center) return {...c, ...center};
+  return c;
+}
+
+function getCountryByLatLon(lat, lon) {
+  if (!geoData) return null;
+  for (const f of geoData.features) {
+    if (pointInFeature(lon, lat, f.geometry)) {
+      const iso3 = getFeatureISO(f);
+      const adminName = f.properties.ADMIN || f.properties.name || f.properties.NAME || iso3;
+      // French Guiana is sometimes merged into France's MultiPolygon in GeoJSON datasets
+      if (iso3 === 'FRA' && lon > -56 && lon < -49 && lat > -0.5 && lat < 7) {
+        return { code3:'GUF', name:'French Guiana', flag:'🌍', alpha2:'gf',
+          region:'South America', capital:'Cayenne', pop:290691, area:83534, currency:'Euro',
+          facts:['Overseas region and department of France, located in South America',
+            'Home to the Guiana Space Centre — Europe\'s primary launch site',
+            'Over 90% of its territory is covered by Amazon rainforest',
+            'Despite being in South America, it uses the Euro as currency',
+            'Borders Brazil to the south and east, and Suriname to the west'],
+          feature: f };
+      }
+      const known = COUNTRIES.find(c =>
+        c.code3 === iso3 ||
+        countryNamesMatch({name: adminName, code3: iso3}, c)
+      );
+      if (known) return {...known, feature:f};
+      // Return a minimal object for countries not in the curated list so hover still works
+      return {
+        code3: iso3,
+        name: adminName,
+        flag: '🌍',
+        alpha2: f.properties.ISO_A2 || f.properties.iso_a2 || f.properties.ISO3166_1_ALPHA2 || '',
+        region: f.properties.REGION_UN || '',
+        capital:'—', pop:0, area:0, currency:'—', facts:[],
+        feature: f,
+      };
+    }
+  }
+  const probes = [
+    [0, 0],
+    [0.18, 0],
+    [-0.18, 0],
+    [0, 0.18],
+    [0, -0.18],
+    [0.18, 0.18],
+    [0.18, -0.18],
+    [-0.18, 0.18],
+    [-0.18, -0.18],
+  ];
+  for (const [dlon, dlat] of probes) {
+    for (const f of geoData.features) {
+      if (pointInFeature(lon + dlon, lat + dlat, f.geometry)) {
+        const iso3 = getFeatureISO(f);
+        const adminName = f.properties.ADMIN || f.properties.name || f.properties.NAME || iso3;
+        if (iso3 === 'FRA' && (lon + dlon) > -56 && (lon + dlon) < -49 && (lat + dlat) > -0.5 && (lat + dlat) < 7) {
+          return { code3:'GUF', name:'French Guiana', flag:'🌍', alpha2:'gf',
+            region:'South America', capital:'Cayenne', pop:290691, area:83534, currency:'Euro',
+            facts:['Overseas region and department of France, located in South America',
+              'Home to the Guiana Space Centre — Europe\'s primary launch site',
+              'Over 90% of its territory is covered by Amazon rainforest',
+              'Despite being in South America, it uses the Euro as currency',
+              'Borders Brazil to the south and east, and Suriname to the west'],
+            feature: f };
+        }
+        const known = COUNTRIES.find(c =>
+          c.code3 === iso3 ||
+          countryNamesMatch({name: adminName, code3: iso3}, c)
+        );
+        if (known) return {...known, feature:f};
+        return {
+          code3: iso3,
+          name: adminName,
+          flag: '🌍',
+          alpha2: f.properties.ISO_A2 || f.properties.iso_a2 || f.properties.ISO3166_1_ALPHA2 || '',
+          region: f.properties.REGION_UN || '',
+          capital:'—', pop:0, area:0, currency:'—', facts:[],
+          feature: f,
+        };
+      }
+    }
+  }
+  const africaFallback = getNearestFeature(lat, lon, 'Africa');
+  if (africaFallback) {
+    const iso3 = getFeatureISO(africaFallback);
+    const adminName = africaFallback.properties.ADMIN || africaFallback.properties.name || africaFallback.properties.NAME || iso3;
+    const known = COUNTRIES.find(c =>
+      c.code3 === iso3 ||
+      countryNamesMatch({name: adminName, code3: iso3}, c)
+    );
+    if (known) return {...known, feature: africaFallback};
+    return {
+      code3: iso3,
+      name: adminName,
+      flag: '🌍',
+      alpha2: africaFallback.properties.ISO_A2 || africaFallback.properties.iso_a2 || africaFallback.properties.ISO3166_1_ALPHA2 || '',
+      region: africaFallback.properties.REGION_UN || '',
+      capital:'—', pop:0, area:0, currency:'—', facts:[],
+      feature: africaFallback,
+    };
+  }
+  return null;
+}
+
+// ── HOVER ─────────────────────────────────────────────────────────────
+let hoverCountry = null;
+function handleHover(px, py) {
+  const country = getCountryAtScreen(px, py);
+  if (country) {
+    const featureKey = getFeatureKey(country.feature || hoveredFeature || {});
+    if (featureKey !== hoveredFeatureKey || country.code3 !== hoveredISO) {
+      hoveredISO = country.code3;
+      hoveredFeature = country.feature || findFeatureByCode(country.code3);
+      hoveredFeatureKey = getFeatureKey(hoveredFeature);
+      buildBorderCanvas();
+    }
+    hoverCountry = country;
+    document.getElementById('tip-name').innerHTML = `${getCountryFlagMarkup(country)} ${country.name}`;
+    document.getElementById('tip-sub').textContent =
+      getDisplayRegion(country.region) + (gameMode==='explore' ? ' · Double-click to explore' : ' · Double-click to select');
+  } else {
+    if (hoveredISO) { hoveredISO=null; hoveredFeature=null; hoveredFeatureKey=null; buildBorderCanvas(); }
+    hoverCountry=null;
+    document.getElementById('tip-name').textContent = '—';
+    document.getElementById('tip-sub').textContent = '';
+  }
+}
+
+// Side info-panel was removed; the explore modal handles its own dismissal
+// via the close button, the backdrop, and the Escape key.
+
+// ── ANIMATION LOOP ────────────────────────────────────────────────────
+let pulseClock = 0;
+let hintState = null;
+let hintGeneration = 0;     // bumped on every useHint() — stale timers compare against this
+
+function clearHint() {
+  const layer = document.getElementById('hint-layer');
+  if (layer) layer.innerHTML = '';
+  hintState = null;
+}
+
+function getCountryScreenPosition(c) {
+  const target = getFocusTarget(c);
+  if (target.lat == null || target.lon == null) return null;
+  const lat = THREE.MathUtils.degToRad(target.lat);
+  const lon = THREE.MathUtils.degToRad(target.lon);
+  const local = new THREE.Vector3(
+    Math.cos(lat) * Math.cos(lon),
+    Math.sin(lat),
+    -Math.cos(lat) * Math.sin(lon)   // east (+lon) maps to -z, matching getHitLatLon
+  ).applyQuaternion(earth.quaternion);
+  const facing = local.z;             // +z faces the camera
+  local.project(camera);
+  return {
+    x: (local.x * 0.5 + 0.5) * innerWidth,
+    y: (-local.y * 0.5 + 0.5) * innerHeight,
+    facing,
+  };
+}
+
+function updateHintOverlay() {
+  if (!hintState) return;
+  const layer = document.getElementById('hint-layer');
+  if (!layer) return;
+  const lat = THREE.MathUtils.degToRad(hintState.lat ?? 0);
+  const lon = THREE.MathUtils.degToRad(hintState.lon ?? 0);
+  // IMPORTANT: z = -cos(lat)*sin(lon)  — east (+lon) maps to -z in this scene.
+  // (getHitLatLon does lon = atan2(-z, x); the inverse is z = -sin(lon)*r.)
+  const local = new THREE.Vector3(
+    Math.cos(lat) * Math.cos(lon),
+    Math.sin(lat),
+    -Math.cos(lat) * Math.sin(lon)
+  ).applyQuaternion(earth.quaternion);
+  const onFrontSide = local.z > 0.05; // +z faces camera; back of globe has z < 0
+  local.project(camera);
+  const x = (local.x * 0.5 + 0.5) * innerWidth;
+  const y = (-local.y * 0.5 + 0.5) * innerHeight;
+  const rings = layer.querySelectorAll('.hint-ring');
+  rings.forEach(r => {
+    r.style.left = `${x}px`;
+    r.style.top = `${y}px`;
+    r.style.opacity = onFrontSide ? '' : '0';
+  });
+  const label = layer.querySelector('.hint-label');
+  if (label) {
+    label.style.left = `${x}px`;
+    label.style.top = `${y}px`;
+    label.style.opacity = onFrontSide ? '' : '0';
+  }
+}
+
+// Hint button.
+// Math: with default Three.js Euler order 'XYZ' and earth.rotation.set(rotX, rotY, 0),
+// the rotation matrix is M = Rx(rotX) * Ry(rotY). When applied to the local point
+// of (lat, lon) — which is (cos lat·cos lon, sin lat, −cos lat·sin lon) per
+// getHitLatLon's convention — Ry is applied first (longitude swing) then Rx
+// (latitude tilt). To bring (lat, lon) to the camera-facing point (0, 0, +1):
+//   rotY = −lon − π/2     (longitude swing)
+//   rotX = +lat            (latitude tilt — POSITIVE for north)
+// Both rotations are then driven by the existing rotX/rotY → earth.rotation pipeline,
+// the same one that handles drag. Verified against Three.js 3D math (real package):
+// 7/7 test cities including Reykjavík and Anchorage land at world (0, 0, 1).
+function useHint() {
+  if (!currentQ) return;
+  if (currentQ.lat == null || currentQ.lon == null) return;
+
+  const gen = ++hintGeneration;
+  clearHint();
+  isDrag = false;
+  dragDist = 0;
+  clickCountry = null;
+
+  const lat = THREE.MathUtils.degToRad(currentQ.lat);
+  const lon = THREE.MathUtils.degToRad(currentQ.lon);
+  let ty = -lon - Math.PI / 2;
+  const tx = lat;
+
+  // Pick the rotY equivalence closest to the current rotY so the spin takes
+  // the short way around (otherwise after several drag-spins the globe could
+  // unwind through multiple full turns to reach the target).
+  while (ty - rotY > Math.PI) ty -= Math.PI * 2;
+  while (ty - rotY < -Math.PI) ty += Math.PI * 2;
+
+  targetRotY = ty;
+  targetRotX = tx;
+
+  viewLocked = true;
+  autoSpin = false;
+  updateRotationButton();
+
+  hintState = { lat: currentQ.lat, lon: currentQ.lon, gen };
+
+  // Wait long enough for the 0.07 lerp to settle (~1s for 98% completion),
+  // then drop the rings+label exactly on the country.
+  setTimeout(() => {
+    if (!hintState || hintState.gen !== gen) return;
+    const layer = document.getElementById('hint-layer');
+    if (!layer) return;
+    ['r1', 'r2', 'r3'].forEach(cls => {
+      const ring = document.createElement('div');
+      ring.className = `hint-ring ${cls}`;
+      layer.appendChild(ring);
+    });
+    if (currentQ && currentQ.name) {
+      const label = document.createElement('div');
+      label.className = 'hint-label';
+      label.textContent = `↓ ${currentQ.name}`;
+      layer.appendChild(label);
+    }
+    updateHintOverlay();
+  }, 1100);
+
+  // Auto-clear after the rings have pulsed; resume rotation if it was on.
+  setTimeout(() => {
+    if (hintState && hintState.gen === gen) {
+      clearHint();
+      if (!answered && rotationEnabled) {
+        viewLocked = false;
+        autoSpin = true;
+        updateRotationButton();
+      }
+    }
+  }, 4200);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  pulseClock += 0.016;
+  if (autoSpin && !isDrag && !viewLocked) targetRotY -= 0.0004; // gentle west→east drift
+  rotX += (targetRotX - rotX) * 0.07;
+  rotY += (targetRotY - rotY) * 0.07;
+  // Allow programmatic tilts (hint, continent focus) to reach high latitudes;
+  // the user's drag is clamped separately in the drag handlers to ±26°.
+  rotX = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, rotX));
+  earth.rotation.set(rotX, rotY, 0);
+  bordMesh.rotation.set(rotX, rotY, 0);
+  camZ += (targetCamZ - camZ) * 0.07;
+  camera.position.z = camZ;
+  updateHintOverlay();
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── COUNTRY DATABASE ──────────────────────────────────────────────────
+// code3 = ISO 3166-1 alpha-3 to match GeoJSON ISO_A3
+const COUNTRY_SEED_DATA = [
+  {name:"Afghanistan",code3:"AFG",flag:"🇦🇫",capital:"Kabul",pop:40099462,area:652230,currency:"Afghan afghani",region:"Asia",lat:33.93,lon:67.71,
+   facts:["Lapis lazuli has been mined here for over 6,000 years","Buzkashi uses a goat carcass — the thrilling national sport","Home to the Hindu Kush, one of the world's highest mountain ranges","Produces over 80% of the world's illicit opium","The giant Buddhas of Bamiyan were carved in the 6th century AD"]},
+  {name:"Albania",code3:"ALB",flag:"🇦🇱",capital:"Tirana",pop:2837743,area:28748,currency:"Albanian lek",region:"Europe",lat:41.15,lon:20.17,
+   facts:["Nodding means 'no' and shaking means 'yes' — the exact opposite!","Has 750,000 bunkers — one for every 4 citizens","The double-headed eagle on the flag dates back 600 years","Mother Teresa was of Albanian heritage","Blood feuds under the Kanun code occasionally persist today"]},
+  {name:"Algeria",code3:"DZA",flag:"🇩🇿",capital:"Algiers",pop:45350148,area:2381741,currency:"Algerian dinar",region:"Africa",lat:28.03,lon:1.66,
+   facts:["Largest country in Africa by area","Sahara Desert covers over 80% of the territory","Home to Timgad — the 'Pompeii of Africa'","Algeria has the largest military in Africa","Tuareg people navigate the Sahara by century-old star maps"]},
+  {name:"Argentina",code3:"ARG",flag:"🇦🇷",capital:"Buenos Aires",pop:45773884,area:2780400,currency:"Argentine peso",region:"South America",lat:-38.42,lon:-63.62,
+   facts:["Tango was born in Buenos Aires in the 1880s","Largest Spanish-speaking country in the world by area","Patagonia holds the third-largest freshwater reserve on Earth","First dinosaur fossil was found here in 1882","Has more psychoanalysts per capita than any other country"]},
+  {name:"Australia",code3:"AUS",flag:"🇦🇺",capital:"Canberra",pop:25922000,area:7692024,currency:"Australian dollar",region:"Oceania",lat:-25.27,lon:133.78,
+   facts:["The only country that is also a continent","Great Barrier Reef is the world's largest living structure","Kangaroos outnumber humans 2 to 1","21 of the world's 25 most venomous snakes live here","The platypus is one of only five egg-laying mammals on Earth"]},
+  {name:"Brazil",code3:"BRA",flag:"🇧🇷",capital:"Brasília",pop:214326223,area:8515767,currency:"Brazilian real",region:"South America",lat:-14.24,lon:-51.93,
+   facts:["Contains 60% of the Amazon rainforest","More primate species here than anywhere else on Earth","Only Portuguese-speaking country in the Americas","The Amazon discharges 20% of all freshwater entering the oceans","Carnival in Rio attracts over 2 million people daily"]},
+  {name:"Canada",code3:"CAN",flag:"🇨🇦",capital:"Ottawa",pop:38246108,area:9984670,currency:"Canadian dollar",region:"North America",lat:56.13,lon:-106.35,
+   facts:["Longest coastline in the world at 202,080 km","Holds 20% of the world's freshwater supply","Has more lakes than the rest of the world combined","Hockey was invented in Canada in the 1800s","The CN Tower was the world's tallest structure for 34 years"]},
+  {name:"China",code3:"CHN",flag:"🇨🇳",capital:"Beijing",pop:1439323776,area:9596960,currency:"Chinese yuan",region:"Asia",lat:35.86,lon:104.20,
+   facts:["The Great Wall stretches over 21,000 km","China invented paper, printing, gunpowder, and the compass","Giant pandas are only found wild in Sichuan province","Uses only one time zone despite spanning five geographical ones","The Forbidden City has 9,999 rooms — one short of heavenly perfection"]},
+  {name:"Colombia",code3:"COL",flag:"🇨🇴",capital:"Bogotá",pop:51874024,area:1141748,currency:"Colombian peso",region:"South America",lat:4.57,lon:-74.30,
+   facts:["Only South American country with both Pacific and Caribbean coasts","World's largest producer of emeralds","More bird species here than any other country on Earth","Gabriel García Márquez, inventor of magical realism, was Colombian","The name Colombia derives from Christopher Columbus"]},
+  {name:"Egypt",code3:"EGY",flag:"🇪🇬",capital:"Cairo",pop:102334403,area:1001449,currency:"Egyptian pound",region:"Africa",lat:26.82,lon:30.80,
+   facts:["The Great Pyramid is the only surviving Wonder of the Ancient World","Ancient Egyptians invented the 365-day calendar","Home to the Nile — the world's longest river","Cairo is the largest city in Africa and the Arab world","Ancient Egyptians used over 700 hieroglyphic symbols"]},
+  {name:"Ethiopia",code3:"ETH",flag:"🇪🇹",capital:"Addis Ababa",pop:120283026,area:1104300,currency:"Ethiopian birr",region:"Africa",lat:9.14,lon:40.49,
+   facts:["Oldest independent country in Africa","Coffee was discovered here — the word comes from the 'Kaffa' region","Has its own calendar with 13 months","Addis Ababa is the highest capital city in Africa","Lucy, one of humanity's oldest ancestors (3.2M years), was found here"]},
+  {name:"France",code3:"FRA",flag:"🇫🇷",capital:"Paris",pop:67391582,area:551695,currency:"Euro",region:"Europe",lat:46.23,lon:2.21,
+   facts:["Most visited country on Earth with 90 million tourists per year","Has 246 types of cheese — one for every day","The Eiffel Tower grows 6 inches taller in summer from heat expansion","French was the world's diplomatic language until the 20th century","The Louvre is the world's most visited art museum"]},
+  {name:"Germany",code3:"DEU",flag:"🇩🇪",capital:"Berlin",pop:83900471,area:357114,currency:"Euro",region:"Europe",lat:51.17,lon:10.45,
+   facts:["Germany has 1,500 different types of beer","The printing press was invented by Gutenberg in Germany in 1440","Has the 4th largest economy in the world","There are over 20,000 castles across Germany","The first magazine in history launched in Germany in 1663"]},
+  {name:"Ghana",code3:"GHA",flag:"🇬🇭",capital:"Accra",pop:32395450,area:238533,currency:"Ghanaian cedi",region:"Africa",lat:7.95,lon:-1.02,
+   facts:["First sub-Saharan country to gain independence in 1957","One of the world's top gold producers","Lake Volta is the world's largest artificial lake by area","Coffin art is a celebrated tradition — planes, fish, and phones shaped coffins","Home to the legendary and powerful Ashanti Kingdom"]},
+  {name:"Greece",code3:"GRC",flag:"🇬🇷",capital:"Athens",pop:10715000,area:131957,currency:"Euro",region:"Europe",lat:39.07,lon:21.82,
+   facts:["Has over 6,000 islands but only 227 are inhabited","The Olympics were born in ancient Greece in 776 BC","Longest coastline in the Mediterranean Sea","More archaeological museums per capita than any other country","The Greek alphabet is the ancestor of Latin and Cyrillic scripts"]},
+  {name:"India",code3:"IND",flag:"🇮🇳",capital:"New Delhi",pop:1380004385,area:3287263,currency:"Indian rupee",region:"Asia",lat:20.59,lon:78.96,
+   facts:["World's largest democracy with 1.4 billion people","Chess was invented in India around the 6th century AD","Has 22 official languages and hundreds of dialects","The Taj Mahal took 22 years and 22,000 workers to build","Produces more films than any other country on Earth"]},
+  {name:"Indonesia",code3:"IDN",flag:"🇮🇩",capital:"Jakarta",pop:273523615,area:1904569,currency:"Indonesian rupiah",region:"Asia",lat:-0.79,lon:113.92,
+   facts:["World's largest archipelago with over 17,000 islands","Has the highest marine biodiversity on Earth","Komodo dragons, the world's largest lizards, live only here","The 1883 Krakatoa eruption was heard 4,800 km away","Has more active volcanoes than any other country"]},
+  {name:"Iran",code3:"IRN",flag:"🇮🇷",capital:"Tehran",pop:83992949,area:1648195,currency:"Iranian rial",region:"Asia",lat:32.43,lon:53.69,
+   facts:["One of the world's oldest civilizations at over 7,000 years","World's largest producer of saffron","Persian poetry is considered among the finest ever written","Sits on 10% of the world's proven oil reserves","Invented the concept of the postal system in 550 BC"]},
+  {name:"Italy",code3:"ITA",flag:"🇮🇹",capital:"Rome",pop:60367477,area:301340,currency:"Euro",region:"Europe",lat:41.87,lon:12.57,
+   facts:["Has more UNESCO World Heritage Sites than any other country (58)","Invented pizza, pasta, and espresso","The Vatican inside Rome is the world's smallest country","Ancient Rome gave the world law, roads, and aqueducts","Italian is the closest living language to classical Latin"]},
+  {name:"Japan",code3:"JPN",flag:"🇯🇵",capital:"Tokyo",pop:125360000,area:377975,currency:"Japanese yen",region:"Asia",lat:36.20,lon:138.25,
+   facts:["Has the world's oldest company — Kongō Gumi, founded 578 AD","Experiences about 1,500 earthquakes every year","More vending machines per person than any other country","Japan's rail system has an average delay of just 54 seconds","Mount Fuji is climbed by over 300,000 people annually"]},
+  {name:"Kenya",code3:"KEN",flag:"🇰🇪",capital:"Nairobi",pop:53771296,area:580367,currency:"Kenyan shilling",region:"Africa",lat:-0.02,lon:37.91,
+   facts:["Home to the world's largest annual wildlife migration","Nairobi is one of only 3 cities with a national park inside city limits","Kenya produces world-class marathon runners due to high-altitude training","The Great Rift Valley runs through Kenya like a geological spine","The Maasai people measure wealth in cattle and children"]},
+  {name:"Mexico",code3:"MEX",flag:"🇲🇽",capital:"Mexico City",pop:128932753,area:1964375,currency:"Mexican peso",region:"North America",lat:23.63,lon:-102.55,
+   facts:["Birthplace of chocolate, corn, and avocados","Mexico City sinks 20 cm per year — built on a drained lake","The eagle-and-snake flag image comes from an Aztec legend","Mexico has 35 UNESCO World Heritage Sites","The Aztec capital Tenochtitlan was built on a lake island"]},
+  {name:"Morocco",code3:"MAR",flag:"🇲🇦",capital:"Rabat",pop:36910560,area:710850,currency:"Moroccan dirham",region:"Africa",lat:31.79,lon:-7.09,
+   facts:["Home to the world's oldest university — al-Qarawiyyin, founded 859 AD","One of only 3 countries with both Atlantic and Mediterranean coasts","Argan oil, the world's rarest, comes exclusively from Morocco","Traditional zellige tilework dates back to the 10th century","Morocco was among the first nations to recognize US independence"]},
+  {name:"Netherlands",code3:"NLD",flag:"🇳🇱",capital:"Amsterdam",pop:17740000,area:41543,currency:"Euro",region:"Europe",lat:52.13,lon:5.29,
+   facts:["One-third of the Netherlands is below sea level","Amsterdam has more bicycles than people","Has more canals than Venice","The Dutch Golden Age (17th century) made them the richest nation","Tulips are not native to the Netherlands — they came from Central Asia"]},
+  {name:"New Zealand",code3:"NZL",flag:"🇳🇿",capital:"Wellington",pop:5084300,area:268838,currency:"New Zealand dollar",region:"Oceania",lat:-40.90,lon:174.89,
+   facts:["First country to give women the right to vote in 1893","Māori name Aotearoa means 'Land of the Long White Cloud'","Lord of the Rings was filmed entirely in New Zealand","Has more sheep per person than almost any other country","New Zealand has the world's highest proportion of endangered species"]},
+  {name:"Nigeria",code3:"NGA",flag:"🇳🇬",capital:"Abuja",pop:206139587,area:923768,currency:"Nigerian naira",region:"Africa",lat:9.08,lon:8.68,
+   facts:["Most populous country in Africa with 206 million people","Nollywood produces more films per year than Hollywood","Has over 500 distinct ethnic groups and languages","Lagos is Africa's largest city with over 20 million people","Nigeria is Africa's largest economy by GDP"]},
+  {name:"Norway",code3:"NOR",flag:"🇳🇴",capital:"Oslo",pop:5421241,area:385207,currency:"Norwegian krone",region:"Europe",lat:60.47,lon:8.47,
+   facts:["Has the world's longest road tunnel at 24.5 km","Discovered oil in 1969, transforming from poor fishing nation to one of richest","Some Norwegians experience 76 days of continuous midnight sun","Invented the paper clip and the cheese slicer","Norway's sovereign wealth fund is the world's largest at over $1.3 trillion"]},
+  {name:"Peru",code3:"PER",flag:"🇵🇪",capital:"Lima",pop:32971846,area:1285216,currency:"Peruvian sol",region:"South America",lat:-9.19,lon:-75.02,
+   facts:["Machu Picchu sits at 2,430 meters above sea level","Home to the Inca Empire, the largest in pre-Columbian America","The Amazon River begins in the Peruvian Andes","Peru has 90 microclimates — more than almost any country","Potatoes were first cultivated in Peru around 8,000 years ago"]},
+  {name:"Russia",code3:"RUS",flag:"🇷🇺",capital:"Moscow",pop:145934462,area:17098242,currency:"Russian ruble",region:"Europe",lat:61.52,lon:105.32,
+   facts:["Largest country on Earth spanning 11 time zones","Lake Baikal holds 20% of the world's unfrozen surface freshwater","Trans-Siberian Railway is the world's longest at 9,288 km","Moscow's metro is famous for its ornate, palace-like stations","Russia has 23 UNESCO World Heritage Sites"]},
+  {name:"Saudi Arabia",code3:"SAU",flag:"🇸🇦",capital:"Riyadh",pop:34813867,area:2149690,currency:"Saudi riyal",region:"Asia",lat:23.89,lon:45.08,
+   facts:["Home to Mecca, Islam's holiest city, visited by 2+ million yearly","Has 25% of the world's known oil reserves","The Empty Quarter is the world's largest continuous sand desert","Has no rivers — only dry seasonal wadis","Women were only allowed to drive from June 2018"]},
+  {name:"South Africa",code3:"ZAF",flag:"🇿🇦",capital:"Pretoria",pop:59308690,area:1219090,currency:"South African rand",region:"Africa",lat:-30.56,lon:22.94,
+   facts:["Has 3 capital cities — one per branch of government","Produces 75% of the world's platinum","Has 11 official languages","The Cradle of Humankind has some of the oldest hominid fossils","Nelson Mandela was imprisoned for 27 years before becoming president"]},
+  {name:"South Korea",code3:"KOR",flag:"🇰🇷",capital:"Seoul",pop:51780579,area:100210,currency:"South Korean won",region:"Asia",lat:35.91,lon:127.77,
+   facts:["Has the world's fastest average internet speeds","K-pop and K-drama are now global cultural phenomena","Koreans consider themselves 1 year old at birth","Seoul is one of the world's 10 largest cities","Went from war-torn poverty to top-20 economy in just 50 years"]},
+  {name:"Spain",code3:"ESP",flag:"🇪🇸",capital:"Madrid",pop:46745216,area:505990,currency:"Euro",region:"Europe",lat:40.46,lon:-3.75,
+   facts:["Has 50 UNESCO World Heritage Sites","La Sagrada Família has been under construction since 1882","Spanish is the 2nd most spoken language by native speakers","Spain invented the mop, submarine, and stapler","La Tomatina: 40,000 kg of tomatoes hurled in the world's largest food fight"]},
+  {name:"Sweden",code3:"SWE",flag:"🇸🇪",capital:"Stockholm",pop:10379295,area:450295,currency:"Swedish krona",region:"Europe",lat:60.13,lon:18.64,
+   facts:["Invented the safety match, zipper, and Bluetooth","Has a 'right to roam' — you can legally camp anywhere in nature","ABBA, IKEA, Spotify, and Minecraft all come from Sweden","Sweden has more than 220,000 islands","Recycles 99% of all household waste"]},
+  {name:"Switzerland",code3:"CHE",flag:"🇨🇭",capital:"Bern",pop:8654622,area:41285,currency:"Swiss franc",region:"Europe",lat:46.82,lon:8.23,
+   facts:["Has not been at war since 1815","The World Wide Web was invented at CERN in Switzerland","Invented milk chocolate and the Swiss Army Knife","Has 4 official languages: German, French, Italian, Romansh","Bern means 'bears' — there are still real bears kept in the city"]},
+  {name:"Thailand",code3:"THA",flag:"🇹🇭",capital:"Bangkok",pop:69950807,area:513120,currency:"Thai baht",region:"Asia",lat:15.87,lon:100.99,
+   facts:["Never colonized by a European power — the only SE Asian nation","World's largest exporter of rice and natural rubber","Bangkok's full ceremonial name is 168 characters long","Has over 40,000 Buddhist temples","The number 9 is very lucky — the Thai word sounds like 'progress'"]},
+  {name:"Turkey",code3:"TUR",flag:"🇹🇷",capital:"Ankara",pop:84339067,area:783562,currency:"Turkish lira",region:"Europe",lat:38.96,lon:35.24,
+   facts:["Istanbul is the only city in the world spanning two continents","Turkey introduced coffee to Europe via the Ottoman Empire","The first wheat and barley were planted here 10,000 years ago","Has more UNESCO World Heritage Sites than all of South America","Santa Claus (St. Nicholas) was born in what is now Turkey"]},
+  {name:"Ukraine",code3:"UKR",flag:"🇺🇦",capital:"Kyiv",pop:43733762,area:603550,currency:"Ukrainian hryvnia",region:"Europe",lat:48.38,lon:31.17,
+   facts:["Largest country entirely within Europe","Kyiv's Arsenalna metro station is the world's deepest at 105.5 m","The helicopter was invented by Ukrainian Igor Sikorsky in 1939","Ukraine is the 'breadbasket of Europe' — produces 25% of global grain","The Chernobyl Exclusion Zone is now a thriving wildlife sanctuary"]},
+  {name:"United Kingdom",code3:"GBR",flag:"🇬🇧",capital:"London",pop:67886011,area:242495,currency:"British pound",region:"Europe",lat:55.38,lon:-3.44,
+   facts:["Invented the World Wide Web, steam engine, and telephone","The British Empire once covered a quarter of the Earth's surface","London was the world's largest city from 1831 to 1925","Shakespeare invented over 1,700 words we still use today","UK has no written constitution — one of only 3 countries without one"]},
+  {name:"United States",code3:"USA",flag:"🇺🇸",capital:"Washington D.C.",pop:331002651,area:9833517,currency:"US dollar",region:"North America",lat:37.09,lon:-95.71,
+   facts:["Has the world's largest economy","Americans eat the equivalent of 100 acres of pizza per day","Has won more Nobel Prizes than any other country","The Library of Congress is the world's largest library","50 stars represent the 50 states — originally there were only 13"]},
+  {name:"Vietnam",code3:"VNM",flag:"🇻🇳",capital:"Hanoi",pop:97338579,area:331212,currency:"Vietnamese đồng",region:"Asia",lat:14.06,lon:108.28,
+   facts:["World's largest exporter of cashews","Ha Long Bay has 2,000+ limestone islands rising from emerald waters","Son Doong is the world's largest cave with its own weather system","2nd largest coffee producer in the world after Brazil","One of the few remaining communist-governed countries"]},
+  {name:"Serbia",code3:"SRB",flag:"🇷🇸",capital:"Belgrade",pop:6945235,area:77589,currency:"Serbian dinar",region:"Europe",lat:44.02,lon:21.01,
+   facts:["Belgrade sits at the confluence of the Danube and Sava rivers","Tesla was Serbian — born in 1856 in present-day Croatia of Serbian parents","Serbia produces 95% of Europe's raspberries","The Exit Festival in Novi Sad is one of Europe's largest music festivals","Nikola Tesla and Mihajlo Pupin are both on Serbian banknotes"]},
+  {name:"Tanzania",code3:"TZA",flag:"🇹🇿",capital:"Dodoma",pop:63298550,area:945087,currency:"Tanzanian shilling",region:"Africa",lat:-6.37,lon:34.89,
+   facts:["Home to Kilimanjaro — Africa's highest peak at 5,895 m","Serengeti hosts the world's largest land mammal migration each year","Zanzibar's spice trade made it the 'Clove Capital' of the world","Lake Tanganyika is the world's second-deepest lake","Julius Nyerere's Ujamaa policy uniquely fostered a single national language, Swahili"]},
+];
+
+const COUNTRY_META = {
+  AFG:{language:'Pashto, Dari',demonym:'Afghan',calendar:'Solar Hijri and Islamic',alphabet:'Arabic script: الف, ب, ت',alphabetExample:'Arabic script examples: الف, ب, ت'},
+  AGO:{language:'Portuguese',demonym:'Angolan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  ALB:{language:'Albanian',demonym:'Albanian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  AND:{language:'Catalan',demonym:'Andorran',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  ARE:{language:'Arabic',demonym:'Emirati',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  ARG:{language:'Spanish',demonym:'Argentine',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  ARM:{language:'Armenian',demonym:'Armenian',calendar:'Gregorian',alphabet:'Armenian alphabet: Ա, Բ, Գ',alphabetExample:'Examples: Ա, Բ, Գ'},
+  ATG:{language:'English',demonym:'Antiguan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  AUS:{language:'English',demonym:'Australian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  AUT:{language:'German',demonym:'Austrian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  AZE:{language:'Azerbaijani',demonym:'Azerbaijani',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BDI:{language:'Kirundi, French, English',demonym:'Burundian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BEL:{language:'Dutch, French, German',demonym:'Belgian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BEN:{language:'French',demonym:'Beninese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BFA:{language:'French',demonym:'Burkinabé',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BGD:{language:'Bengali',demonym:'Bangladeshi',calendar:'Gregorian and Bengali',alphabet:'Bengali script: অ, আ, ই',alphabetExample:'Examples: অ, আ, ই'},
+  BGR:{language:'Bulgarian',demonym:'Bulgarian',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  BHR:{language:'Arabic',demonym:'Bahraini',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  BHS:{language:'English',demonym:'Bahamian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BIH:{language:'Bosnian, Croatian, Serbian',demonym:'Bosnian',calendar:'Gregorian',alphabet:'Latin and Cyrillic',alphabetExample:'Examples: A, B, C — А, Б, В'},
+  BLR:{language:'Belarusian, Russian',demonym:'Belarusian',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  BLZ:{language:'English',demonym:'Belizean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BOL:{language:'Spanish, Quechua, Aymara, Guarani (and 33 more)',demonym:'Bolivian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BRA:{language:'Portuguese',demonym:'Brazilian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BRB:{language:'English',demonym:'Barbadian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  BRN:{language:'Malay, English',demonym:'Bruneian',calendar:'Gregorian and Islamic',alphabet:'Latin and Jawi (Arabic) scripts',alphabetExample:'Examples: A, B, C — ا, ب, ت'},
+  BTN:{language:'Dzongkha',demonym:'Bhutanese',calendar:'Bhutanese (lunar)',alphabet:'Tibetan script: ཀ, ཁ, ག',alphabetExample:'Examples: ཀ, ཁ, ག'},
+  BWA:{language:'English, Setswana',demonym:'Motswana',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CAF:{language:'French, Sango',demonym:'Central African',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CAN:{language:'English, French',demonym:'Canadian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CHE:{language:'German, French, Italian, Romansh',demonym:'Swiss',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CHL:{language:'Spanish',demonym:'Chilean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CHN:{language:'Mandarin Chinese',demonym:'Chinese',calendar:'Gregorian and Chinese lunar',alphabet:'Chinese characters: 中, 国, 人',alphabetExample:'Examples: 中, 国, 人'},
+  CIV:{language:'French',demonym:'Ivorian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CMR:{language:'French, English',demonym:'Cameroonian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  COD:{language:'French, Lingala, Kikongo, Swahili, Tshiluba',demonym:'Congolese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  COG:{language:'French, Lingala, Kituba',demonym:'Congolese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  COL:{language:'Spanish',demonym:'Colombian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  COM:{language:'Comorian, Arabic, French',demonym:'Comorian',calendar:'Gregorian and Islamic',alphabet:'Arabic and Latin scripts',alphabetExample:'Examples: ا, ب, ت — A, B, C'},
+  CPV:{language:'Portuguese, Cape Verdean Creole',demonym:'Cape Verdean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CRI:{language:'Spanish',demonym:'Costa Rican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CUB:{language:'Spanish',demonym:'Cuban',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  CYP:{language:'Greek, Turkish',demonym:'Cypriot',calendar:'Gregorian',alphabet:'Greek and Latin',alphabetExample:'Examples: Α, Β, Γ — A, B, C'},
+  CZE:{language:'Czech',demonym:'Czech',calendar:'Gregorian',alphabet:'Latin with diacritics: A, Á, Č',alphabetExample:'Examples: A, Á, Č'},
+  DEU:{language:'German',demonym:'German',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  DJI:{language:'French, Arabic',demonym:'Djiboutian',calendar:'Gregorian and Islamic',alphabet:'Latin and Arabic scripts',alphabetExample:'Examples: A, B, C — ا, ب, ت'},
+  DMA:{language:'English',demonym:'Dominican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  DNK:{language:'Danish',demonym:'Danish',calendar:'Gregorian',alphabet:'Latin alphabet plus Æ, Ø, Å',alphabetExample:'Examples: A, B, Å'},
+  DOM:{language:'Spanish',demonym:'Dominican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  DZA:{language:'Arabic, Tamazight',demonym:'Algerian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  ECU:{language:'Spanish, Quechua',demonym:'Ecuadorian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  EGY:{language:'Arabic',demonym:'Egyptian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  ERI:{language:'Tigrinya, Arabic, English',demonym:'Eritrean',calendar:'Gregorian and Ge\'ez',alphabet:'Ge\'ez script: ሀ, ለ, ሐ',alphabetExample:'Examples: ሀ, ለ, ሐ'},
+  ESP:{language:'Spanish, Catalan, Galician, Basque',demonym:'Spanish',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  EST:{language:'Estonian',demonym:'Estonian',calendar:'Gregorian',alphabet:'Latin alphabet plus Õ, Ä, Ö, Ü',alphabetExample:'Examples: A, Õ, Ä'},
+  ETH:{language:'Amharic, Oromo, Tigrinya',demonym:'Ethiopian',calendar:'Ethiopian calendar',alphabet:'Ge\'ez script: ሀ, ለ, ሐ',alphabetExample:'Examples: ሀ, ለ, ሐ'},
+  FIN:{language:'Finnish, Swedish',demonym:'Finnish',calendar:'Gregorian',alphabet:'Latin alphabet plus Å, Ä, Ö',alphabetExample:'Examples: A, Ä, Ö'},
+  FJI:{language:'English, Fijian, Hindi',demonym:'Fijian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  FRA:{language:'French',demonym:'French',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  FSM:{language:'English (and 8 official local languages)',demonym:'Micronesian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GAB:{language:'French',demonym:'Gabonese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GBR:{language:'English',demonym:'British',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GEO:{language:'Georgian',demonym:'Georgian',calendar:'Gregorian',alphabet:'Georgian alphabet: ა, ბ, გ',alphabetExample:'Examples: ა, ბ, გ'},
+  GHA:{language:'English, Akan, Ewe, Ga',demonym:'Ghanaian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GIN:{language:'French',demonym:'Guinean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GMB:{language:'English',demonym:'Gambian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GNQ:{language:'Spanish, French, Portuguese',demonym:'Equatoguinean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GRC:{language:'Greek',demonym:'Greek',calendar:'Gregorian',alphabet:'Greek alphabet: Α, Β, Γ',alphabetExample:'Examples: Α, Β, Γ'},
+  GRD:{language:'English',demonym:'Grenadian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GTM:{language:'Spanish',demonym:'Guatemalan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  GUY:{language:'English',demonym:'Guyanese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  HND:{language:'Spanish',demonym:'Honduran',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  HRV:{language:'Croatian',demonym:'Croatian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  HTI:{language:'Haitian Creole, French',demonym:'Haitian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  HUN:{language:'Hungarian',demonym:'Hungarian',calendar:'Gregorian',alphabet:'Latin with diacritics: A, Á, Ö, Ű',alphabetExample:'Examples: A, Á, Ű'},
+  IDN:{language:'Indonesian',demonym:'Indonesian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  IND:{language:'Hindi, English, many regional languages',demonym:'Indian',calendar:'Gregorian and Indian national',alphabet:'Devanagari: अ, आ, इ',alphabetExample:'Examples: अ, आ, इ'},
+  IRL:{language:'Irish, English',demonym:'Irish',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  IRN:{language:'Persian (Farsi)',demonym:'Iranian',calendar:'Solar Hijri',alphabet:'Persian script: ا, ب, پ',alphabetExample:'Examples: ا, ب, پ'},
+  IRQ:{language:'Arabic, Kurdish',demonym:'Iraqi',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  ISL:{language:'Icelandic',demonym:'Icelander',calendar:'Gregorian',alphabet:'Latin plus Þ, Ð, Æ',alphabetExample:'Examples: A, Þ, Æ'},
+  ISR:{language:'Hebrew, Arabic',demonym:'Israeli',calendar:'Hebrew and Gregorian',alphabet:'Hebrew script: א, ב, ג',alphabetExample:'Examples: א, ב, ג'},
+  ITA:{language:'Italian',demonym:'Italian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  JAM:{language:'English, Jamaican Patois',demonym:'Jamaican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  JOR:{language:'Arabic',demonym:'Jordanian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  JPN:{language:'Japanese',demonym:'Japanese',calendar:'Gregorian and Japanese era',alphabet:'Kanji, Hiragana, Katakana: あ, い, 漢',alphabetExample:'Examples: あ, い, 漢'},
+  KAZ:{language:'Kazakh, Russian',demonym:'Kazakhstani',calendar:'Gregorian',alphabet:'Cyrillic and (now) Latin: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  KEN:{language:'Swahili, English',demonym:'Kenyan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  KGZ:{language:'Kyrgyz, Russian',demonym:'Kyrgyz',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  KHM:{language:'Khmer',demonym:'Cambodian',calendar:'Buddhist and Gregorian',alphabet:'Khmer script: ក, ខ, គ',alphabetExample:'Examples: ក, ខ, គ'},
+  KIR:{language:'English, Gilbertese',demonym:'I-Kiribati',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  KNA:{language:'English',demonym:'Kittitian or Nevisian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  KOR:{language:'Korean',demonym:'South Korean',calendar:'Gregorian',alphabet:'Hangul: 가, 나, 다',alphabetExample:'Examples: 가, 나, 다'},
+  KWT:{language:'Arabic',demonym:'Kuwaiti',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  LAO:{language:'Lao',demonym:'Laotian',calendar:'Buddhist and Gregorian',alphabet:'Lao script: ກ, ຂ, ຄ',alphabetExample:'Examples: ກ, ຂ, ຄ'},
+  LBN:{language:'Arabic, French',demonym:'Lebanese',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  LBR:{language:'English',demonym:'Liberian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  LBY:{language:'Arabic',demonym:'Libyan',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  LCA:{language:'English, French Creole',demonym:'Saint Lucian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  LIE:{language:'German',demonym:'Liechtensteiner',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  LKA:{language:'Sinhala, Tamil',demonym:'Sri Lankan',calendar:'Gregorian',alphabet:'Sinhala and Tamil scripts',alphabetExample:'Examples: අ, ආ — அ, ஆ'},
+  LSO:{language:'Sesotho, English',demonym:'Mosotho',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  LTU:{language:'Lithuanian',demonym:'Lithuanian',calendar:'Gregorian',alphabet:'Latin alphabet plus Ą, Č, Ę, Š, Ū',alphabetExample:'Examples: A, Ą, Š'},
+  LUX:{language:'Luxembourgish, French, German',demonym:'Luxembourger',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  LVA:{language:'Latvian',demonym:'Latvian',calendar:'Gregorian',alphabet:'Latin alphabet plus Ā, Č, Š, Ž',alphabetExample:'Examples: A, Ā, Š'},
+  MAR:{language:'Arabic, Amazigh',demonym:'Moroccan',calendar:'Gregorian and Islamic',alphabet:'Arabic and Tifinagh: ا, ⴰ, ⴱ',alphabetExample:'Examples: ا, ⴰ, ⴱ'},
+  MCO:{language:'French',demonym:'Monégasque',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MDA:{language:'Romanian',demonym:'Moldovan',calendar:'Gregorian',alphabet:'Latin alphabet plus Ă, Â, Î, Ș, Ț',alphabetExample:'Examples: A, Ă, Ș'},
+  MDG:{language:'Malagasy, French',demonym:'Malagasy',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MDV:{language:'Dhivehi',demonym:'Maldivian',calendar:'Gregorian and Islamic',alphabet:'Thaana script: ހ, ށ, ނ',alphabetExample:'Examples: ހ, ށ, ނ'},
+  MEX:{language:'Spanish',demonym:'Mexican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MHL:{language:'Marshallese, English',demonym:'Marshallese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MKD:{language:'Macedonian, Albanian',demonym:'Macedonian',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  MLI:{language:'French, Bambara',demonym:'Malian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MLT:{language:'Maltese, English',demonym:'Maltese',calendar:'Gregorian',alphabet:'Latin plus Ċ, Ġ, Ħ, Ż',alphabetExample:'Examples: A, Ġ, Ħ'},
+  MMR:{language:'Burmese',demonym:'Burmese',calendar:'Buddhist and Gregorian',alphabet:'Burmese script: က, ခ, ဂ',alphabetExample:'Examples: က, ခ, ဂ'},
+  MNE:{language:'Montenegrin',demonym:'Montenegrin',calendar:'Gregorian',alphabet:'Latin and Cyrillic',alphabetExample:'Examples: A, B, C — А, Б, В'},
+  MNG:{language:'Mongolian',demonym:'Mongolian',calendar:'Gregorian and Lunar',alphabet:'Cyrillic and Mongol bichig',alphabetExample:'Examples: А, Б, В — ᠠ, ᠡ'},
+  MOZ:{language:'Portuguese',demonym:'Mozambican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MRT:{language:'Arabic',demonym:'Mauritanian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  MUS:{language:'English, French, Mauritian Creole',demonym:'Mauritian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MWI:{language:'English, Chichewa',demonym:'Malawian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  MYS:{language:'Malay',demonym:'Malaysian',calendar:'Gregorian and Islamic',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NAM:{language:'English',demonym:'Namibian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NER:{language:'French',demonym:'Nigerien',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NGA:{language:'English, Hausa, Yoruba, Igbo',demonym:'Nigerian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NIC:{language:'Spanish',demonym:'Nicaraguan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NLD:{language:'Dutch',demonym:'Dutch',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NOR:{language:'Norwegian',demonym:'Norwegian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NPL:{language:'Nepali',demonym:'Nepali',calendar:'Bikram Sambat and Gregorian',alphabet:'Devanagari: अ, आ, इ',alphabetExample:'Examples: अ, आ, इ'},
+  NRU:{language:'Nauruan, English',demonym:'Nauruan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  NZL:{language:'English, Maori, NZ Sign Language',demonym:'New Zealander',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  OMN:{language:'Arabic',demonym:'Omani',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  PAK:{language:'Urdu, English',demonym:'Pakistani',calendar:'Gregorian and Islamic',alphabet:'Urdu script: ا, ب, پ',alphabetExample:'Examples: ا, ب, پ'},
+  PAN:{language:'Spanish',demonym:'Panamanian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  PER:{language:'Spanish, Quechua, Aymara',demonym:'Peruvian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  PHL:{language:'Filipino, English',demonym:'Filipino',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  PLW:{language:'Palauan, English',demonym:'Palauan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  PNG:{language:'Tok Pisin, English, Hiri Motu',demonym:'Papua New Guinean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  POL:{language:'Polish',demonym:'Polish',calendar:'Gregorian',alphabet:'Latin alphabet plus Ą, Ć, Ę, Ł, Ń, Ó, Ś, Ź, Ż',alphabetExample:'Examples: A, Ą, Ł'},
+  PRK:{language:'Korean',demonym:'North Korean',calendar:'Juche calendar',alphabet:'Hangul: 가, 나, 다',alphabetExample:'Examples: 가, 나, 다'},
+  PRT:{language:'Portuguese',demonym:'Portuguese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  PRY:{language:'Spanish, Guarani',demonym:'Paraguayan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  PSE:{language:'Arabic',demonym:'Palestinian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  QAT:{language:'Arabic',demonym:'Qatari',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  ROU:{language:'Romanian',demonym:'Romanian',calendar:'Gregorian',alphabet:'Latin alphabet plus Ă, Â, Î, Ș, Ț',alphabetExample:'Examples: A, Ă, Ș'},
+  RUS:{language:'Russian',demonym:'Russian',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  RWA:{language:'Kinyarwanda, French, English, Swahili',demonym:'Rwandan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SAU:{language:'Arabic',demonym:'Saudi',calendar:'Hijri and Gregorian',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  SDN:{language:'Arabic, English',demonym:'Sudanese',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  SEN:{language:'French, Wolof',demonym:'Senegalese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SGP:{language:'English, Mandarin, Malay, Tamil',demonym:'Singaporean',calendar:'Gregorian',alphabet:'Latin, Chinese, Tamil, Jawi',alphabetExample:'Examples: A, B, C — 中, 国, 人 — அ, ஆ, இ'},
+  SLB:{language:'English',demonym:'Solomon Islander',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SLE:{language:'English, Krio',demonym:'Sierra Leonean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SLV:{language:'Spanish',demonym:'Salvadoran',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SMR:{language:'Italian',demonym:'Sammarinese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SOM:{language:'Somali, Arabic',demonym:'Somali',calendar:'Gregorian and Islamic',alphabet:'Latin and Arabic scripts',alphabetExample:'Examples: A, B, C — ا, ب, ت'},
+  SRB:{language:'Serbian',demonym:'Serbian',calendar:'Gregorian',alphabet:'Cyrillic and Latin',alphabetExample:'Examples: А, Б, В — A, B, C'},
+  SSD:{language:'English',demonym:'South Sudanese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  STP:{language:'Portuguese',demonym:'São Toméan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SUR:{language:'Dutch',demonym:'Surinamese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SVK:{language:'Slovak',demonym:'Slovak',calendar:'Gregorian',alphabet:'Latin with diacritics: A, Á, Č, Š',alphabetExample:'Examples: A, Á, Š'},
+  SVN:{language:'Slovenian',demonym:'Slovenian',calendar:'Gregorian',alphabet:'Latin alphabet plus Č, Š, Ž',alphabetExample:'Examples: A, Č, Š'},
+  SWE:{language:'Swedish',demonym:'Swedish',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SWZ:{language:'siSwati, English',demonym:'Swazi',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SYC:{language:'Seychellois Creole, English, French',demonym:'Seychellois',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  SYR:{language:'Arabic',demonym:'Syrian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  TCD:{language:'French, Arabic',demonym:'Chadian',calendar:'Gregorian',alphabet:'Latin and Arabic scripts',alphabetExample:'Examples: A, B, C — ا, ب, ت'},
+  TGO:{language:'French',demonym:'Togolese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  THA:{language:'Thai',demonym:'Thai',calendar:'Thai solar calendar',alphabet:'Thai script: ก, ข, ค',alphabetExample:'Examples: ก, ข, ค'},
+  TJK:{language:'Tajik',demonym:'Tajikistani',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  TKM:{language:'Turkmen',demonym:'Turkmen',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  TLS:{language:'Tetum, Portuguese',demonym:'Timorese',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  TON:{language:'Tongan, English',demonym:'Tongan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  TTO:{language:'English',demonym:'Trinidadian and Tobagonian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  TUN:{language:'Arabic, French',demonym:'Tunisian',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  TUR:{language:'Turkish',demonym:'Turkish',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  TUV:{language:'Tuvaluan, English',demonym:'Tuvaluan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  TZA:{language:'Swahili, English',demonym:'Tanzanian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  UGA:{language:'English, Swahili',demonym:'Ugandan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  UKR:{language:'Ukrainian',demonym:'Ukrainian',calendar:'Gregorian',alphabet:'Cyrillic: А, Б, В',alphabetExample:'Examples: А, Б, В'},
+  URY:{language:'Spanish',demonym:'Uruguayan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  USA:{language:'English',demonym:'American',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  UZB:{language:'Uzbek',demonym:'Uzbek',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  VAT:{language:'Italian, Latin',demonym:'Vatican',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  VCT:{language:'English',demonym:'Vincentian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  VEN:{language:'Spanish',demonym:'Venezuelan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  VNM:{language:'Vietnamese',demonym:'Vietnamese',calendar:'Gregorian',alphabet:'Latin alphabet with diacritics: A, Â, Ă',alphabetExample:'Examples: A, Â, Ă'},
+  VUT:{language:'Bislama, English, French',demonym:'Ni-Vanuatu',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  WSM:{language:'Samoan, English',demonym:'Samoan',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  YEM:{language:'Arabic',demonym:'Yemeni',calendar:'Gregorian and Islamic',alphabet:'Arabic script: ا, ب, ت',alphabetExample:'Examples: ا, ب, ت'},
+  ZAF:{language:'English, Afrikaans, Zulu, Xhosa, and more',demonym:'South African',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  ZMB:{language:'English',demonym:'Zambian',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+  ZWE:{language:'English, Shona, Ndebele (and 13 more)',demonym:'Zimbabwean',calendar:'Gregorian',alphabet:'Latin alphabet: A, B, C',alphabetExample:'Examples: A, B, C'},
+};
+
+let COUNTRIES = [];
+let countriesReady = false;
+let geoReady = false;
+
+const seedByCode = new Map(COUNTRY_SEED_DATA.map(c => [c.code3, c]));
+
+function normalizeRegion(apiCountry) {
+  const region = apiCountry?.region || '';
+  const subregion = apiCountry?.subregion || '';
+  if (region === 'Americas') {
+    if (subregion === 'South America') return 'South America';
+    return 'North America';
+  }
+  return region || subregion || 'Other';
+}
+
+function joinObjectValues(obj) {
+  return Object.values(obj || {}).map(v => v?.name || v).filter(Boolean).join(', ');
+}
+
+function makeGenericFacts(country) {
+  const languages = country.language || 'an official language';
+  const currency = country.currency || 'its currency';
+  return [
+    `${country.name} is in ${country.region || 'the world map'}.`,
+    `Capital: ${country.capital || '—'}.`,
+    `Population: ${Number(country.pop || 0).toLocaleString()}.`,
+    `Area: ${Number(country.area || 0).toLocaleString()} km².`,
+    `Languages: ${languages}; currency: ${currency}.`,
+  ];
+}
+
+function buildCountryRecord(apiCountry) {
+  const seed = seedByCode.get(apiCountry.cca3) || {};
+  const languages = joinObjectValues(apiCountry.languages);
+  const currency = joinObjectValues(apiCountry.currencies);
+  const latlng = Array.isArray(apiCountry.latlng) ? apiCountry.latlng : [];
+  const region = normalizeRegion(apiCountry);
+  const baseName = apiCountry?.name?.common || apiCountry?.name?.official || apiCountry.cca3;
+  const alpha2 = (apiCountry.cca2 || '').toString().toLowerCase();
+  return {
+    name: seed.name || baseName,
+    code3: apiCountry.cca3,
+    alpha2,
+    flagSvg: apiCountry?.flags?.svg || '',
+    flagPng: apiCountry?.flags?.png || '',
+    flag: seed.flag || '🌍',
+    capital: seed.capital || apiCountry.capital?.[0] || '—',
+    pop: seed.pop || apiCountry.population || 0,
+    area: seed.area || apiCountry.area || 0,
+    currency: seed.currency || currency || '—',
+    region: seed.region || region,
+    lat: seed.lat ?? latlng[0] ?? 0,
+    lon: seed.lon ?? latlng[1] ?? 0,
+    language: seed.language || languages || '—',
+    demonym: seed.demonym || apiCountry?.demonym || baseName,
+    calendar: seed.calendar || 'Gregorian',
+    alphabet: seed.alphabet || 'Latin alphabet: A, B, C',
+    alphabetExample: seed.alphabetExample || 'Examples: A, B, C',
+    facts: seed.facts || makeGenericFacts({
+      name: seed.name || baseName,
+      region: seed.region || region,
+      capital: seed.capital || apiCountry.capital?.[0] || '—',
+      pop: seed.pop || apiCountry.population || 0,
+      area: seed.area || apiCountry.area || 0,
+      language: seed.language || languages || '—',
+      currency: seed.currency || currency || '—',
+    }),
+    feature: null,
+  };
+}
+
+function buildCountryDataset(coreCountries, enrichCountries) {
+  const enrichByCode = new Map((enrichCountries || []).map(c => [c.cca3, c]));
+  return coreCountries
+    .filter(c => c.unMember || c.cca3 === 'VAT' || c.cca3 === 'PSE')
+    .map(c => buildCountryRecord({...c, ...(enrichByCode.get(c.cca3) || {})}))
+    .sort((a, b) => a.region.localeCompare(b.region) || a.name.localeCompare(b.name));
+}
+
+function maybeFinishLoading() {
+  if (!countriesReady || !geoReady) return;
+  updateCollCount();
+  updateGeoButton();
+  updateRotationButton();
+  document.getElementById('loading').classList.add('gone');
+}
+
+async function loadCountries() {
+  loadMsg.textContent = 'Loading countries…';
+  try {
+    if (Array.isArray(window.TERRA_COUNTRIES_DATA) && window.TERRA_COUNTRIES_DATA.length) {
+      COUNTRIES = window.TERRA_COUNTRIES_DATA.map(c => ({...c}));
+      countriesReady = true;
+      maybeFinishLoading();
+      return;
+    }
+
+    const localRes = await fetch('data/countries.json');
+    if (localRes.ok) {
+      COUNTRIES = await localRes.json();
+      countriesReady = true;
+      maybeFinishLoading();
+      return;
+    }
+
+    const [coreRes, enrichRes] = await Promise.all([
+      fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,capital,region,subregion,population,area,latlng,unMember'),
+      fetch('https://restcountries.com/v3.1/all?fields=cca3,languages,currencies,flags'),
+    ]);
+    const [coreCountries, enrichCountries] = await Promise.all([coreRes.json(), enrichRes.json()]);
+    COUNTRIES = buildCountryDataset(coreCountries, enrichCountries);
+  } catch (err) {
+    try {
+      const localRes = await fetch('data/countries.json');
+      if (localRes.ok) {
+        COUNTRIES = await localRes.json();
+      } else {
+        COUNTRIES = COUNTRY_SEED_DATA.map(c => ({...c}));
+      }
+    } catch {
+      COUNTRIES = COUNTRY_SEED_DATA.map(c => ({...c}));
+    }
+  }
+  countriesReady = true;
+  maybeFinishLoading();
+}
+
+loadCountries();
+
+function getCountryMeta(c) {
+  return COUNTRY_META[c.code3] || null;
+}
+
+function getCountryProfile(c) {
+  const meta = getCountryMeta(c);
+  if (meta) return {...c, ...meta};
+  // No curated meta — use whatever the country record already has, never overwrite with '—'
+  return {
+    ...c,
+    language: c.language && c.language !== '—' ? c.language : (c.language || '—'),
+    demonym:  c.demonym  && c.demonym  !== '—' ? c.demonym  : (c.name ? c.name + 'n' : '—'),
+    calendar: c.calendar || 'Gregorian',
+    alphabet: c.alphabet || 'Latin alphabet: A, B, C',
+    alphabetExample: c.alphabetExample || 'Examples: A, B, C',
+  };
+}
+
+const COUNTRY_ALIASES = {
+  USA: ['United States', 'United States of America', 'US', 'U.S.', 'America'],
+  GBR: ['United Kingdom', 'Great Britain', 'Britain', 'UK', 'U.K.', 'England'],
+  KOR: ['South Korea', 'Republic of Korea', 'Korea, South', 'S. Korea'],
+  PRK: ['North Korea', "Democratic People's Republic of Korea", 'Korea, North', 'N. Korea', 'DPRK'],
+  RUS: ['Russia', 'Russian Federation'],
+  VNM: ['Vietnam', 'Viet Nam'],
+  IRN: ['Iran', 'Islamic Republic of Iran', 'Persia'],
+  THA: ['Thailand', 'Kingdom of Thailand', 'Siam'],
+  CHE: ['Switzerland', 'Swiss Confederation'],
+  ZAF: ['South Africa', 'Republic of South Africa'],
+  BHS: ['Bahamas', 'The Bahamas', 'Commonwealth of the Bahamas'],
+  COD: ['DR Congo', 'Democratic Republic of the Congo', 'Democratic Republic of Congo', 'Congo DR', 'Congo, Dem. Rep.', 'Congo (Kinshasa)', 'DRC', 'Zaire'],
+  COG: ['Republic of the Congo', 'Republic of Congo', 'Congo', 'Congo Republic', 'Congo (Brazzaville)', 'Congo, Rep.'],
+  MKD: ['North Macedonia', 'Macedonia', 'Republic of North Macedonia', 'Republic of Macedonia', 'FYROM'],
+  SWZ: ['Eswatini', 'Swaziland', 'Kingdom of Eswatini'],
+  CPV: ['Cape Verde', 'Cabo Verde', 'Republic of Cabo Verde'],
+  TLS: ['East Timor', 'Timor-Leste', 'Timor Leste'],
+  PSE: ['Palestine', 'Palestinian Territory', 'Palestinian Territories', 'State of Palestine', 'West Bank and Gaza'],
+  CIV: ["Ivory Coast", "Cote d'Ivoire", "Côte d'Ivoire", 'Republic of Côte d\'Ivoire'],
+  TTO: ['Trinidad and Tobago', 'Trinidad & Tobago'],
+  ATG: ['Antigua and Barbuda', 'Antigua & Barbuda'],
+  KNA: ['Saint Kitts and Nevis', 'St. Kitts and Nevis', 'St Kitts', 'Saint Christopher and Nevis'],
+  LCA: ['Saint Lucia', 'St. Lucia', 'St Lucia'],
+  VCT: ['Saint Vincent and the Grenadines', 'St. Vincent', 'St Vincent', 'Saint Vincent'],
+  STP: ['São Tomé and Príncipe', 'Sao Tome and Principe', 'Sao Tome', 'São Tomé'],
+  BIH: ['Bosnia and Herzegovina', 'Bosnia', 'Bosnia & Herzegovina', 'Bosnia-Herzegovina'],
+  MNE: ['Montenegro', 'Crna Gora'],
+  SRB: ['Serbia', 'Republic of Serbia', 'Srbija'],
+  ARE: ['UAE', 'United Arab Emirates', 'Emirates'],
+  CZE: ['Czechia', 'Czech Republic', 'Česko'],
+  VAT: ['Vatican City', 'Vatican', 'Holy See', 'Vatican City State'],
+  MMR: ['Myanmar', 'Burma'],
+  LAO: ['Laos', "Lao People's Democratic Republic", 'Lao PDR'],
+  BRN: ['Brunei', 'Brunei Darussalam', 'Negara Brunei Darussalam'],
+  MDA: ['Moldova', 'Republic of Moldova'],
+  EGY: ['Egypt', 'Arab Republic of Egypt', 'Misr'],
+  SYR: ['Syria', 'Syrian Arab Republic'],
+  TZA: ['Tanzania', 'United Republic of Tanzania'],
+  VEN: ['Venezuela', 'Bolivarian Republic of Venezuela'],
+  BOL: ['Bolivia', 'Plurinational State of Bolivia'],
+  LBY: ['Libya', 'State of Libya'],
+  IRL: ['Ireland', 'Republic of Ireland', 'Eire'],
+  NLD: ['Netherlands', 'The Netherlands', 'Holland'],
+  PHL: ['Philippines', 'The Philippines', 'Republic of the Philippines'],
+  GMB: ['Gambia', 'The Gambia', 'Republic of the Gambia'],
+  SLB: ['Solomon Islands', 'The Solomon Islands'],
+  MHL: ['Marshall Islands', 'Republic of the Marshall Islands'],
+  FSM: ['Micronesia', 'Federated States of Micronesia'],
+  CAF: ['Central African Republic', 'CAR', 'Centrafrique'],
+  DOM: ['Dominican Republic', 'Republica Dominicana'],
+  DMA: ['Dominica', 'Commonwealth of Dominica'],
+  GNB: ['Guinea-Bissau', 'Guinea Bissau'],
+  GNQ: ['Equatorial Guinea', 'Guinea Ecuatorial'],
+  SLV: ['El Salvador', 'Republic of El Salvador'],
+  CRI: ['Costa Rica', 'Republic of Costa Rica'],
+  PNG: ['Papua New Guinea', 'PNG'],
+  XKX: ['Kosovo', 'Republic of Kosovo'],
+  TWN: ['Taiwan', 'Republic of China', 'Chinese Taipei'],
+  HKG: ['Hong Kong', 'Hong Kong SAR'],
+};
+
+function countryNamesMatch(a, b) {
+  const setA = new Set([a?.name, ...(COUNTRY_ALIASES[a?.code3] || [])].map(normalizeCountryName));
+  const setB = new Set([b?.name, ...(COUNTRY_ALIASES[b?.code3] || [])].map(normalizeCountryName));
+  for (const v of setA) {
+    if (setB.has(v)) return true;
+  }
+  return false;
+}
+
+function getContinentRegions(region) {
+  return region === 'America' ? ['North America', 'South America'] : [region];
+}
+
+function getDisplayRegion(region) {
+  return (region === 'North America' || region === 'South America') ? 'America' : region;
+}
+
+function getContinentPool(region) {
+  const regions = getContinentRegions(region);
+  return COUNTRIES.filter(c => regions.includes(c.region));
+}
+
+function getQuizMatchName(c) {
+  return c?.code3 === 'USA' ? 'United States of America' : c?.name || '';
+}
+
+// Hand-picked centers + zoom levels for each continent so the camera frames the
+// region nicely (an arithmetic mean breaks for the Pacific where islands wrap
+// around ±180°, and tends to drift to oceans for big continents).
+const CONTINENT_FOCUS = {
+  'Africa':        { lat:  4,   lon:  20, camZ: 2.7 },
+  'Asia':          { lat: 32,   lon:  95, camZ: 2.7 },
+  'Europe':        { lat: 54,   lon:  15, camZ: 2.5 },
+  'America':       { lat: 12,   lon: -85, camZ: 2.7 },
+  'North America': { lat: 45,   lon: -100,camZ: 2.6 },
+  'South America': { lat: -15,  lon: -60, camZ: 2.6 },
+  'Oceania':       { lat: -22,  lon: 140, camZ: 2.6 },
+};
+
+function getRegionFocus(region) {
+  const preset = CONTINENT_FOCUS[region];
+  if (preset) {
+    return {name:region, code3:region.slice(0,3).toUpperCase(), flag:'🌐', capital:'—', pop:0, area:0, currency:'—', region, lat: preset.lat, lon: preset.lon, camZ: preset.camZ};
+  }
+  // Fallback for any unexpected region
+  const members = getContinentPool(region);
+  if (!members.length) return currentQ || COUNTRIES[0];
+  const lat = members.reduce((sum, c) => sum + c.lat, 0) / members.length;
+  const lon = members.reduce((sum, c) => sum + c.lon, 0) / members.length;
+  return {name:region, code3:region.slice(0,3).toUpperCase(), flag:'🌐', capital:'—', pop:0, area:0, currency:'—', region, lat, lon};
+}
+
+// ── GAME STATE ─────────────────────────────────────────────────────────
+let gameMode = 'find';
+let currentQ = null;
+let score=0, total=0, streak=0;
+let roundQ=0;
+let answered=false;
+let gameActive=false;
+let usedCodes=[];
+let collection = JSON.parse(localStorage.getItem('terra_coll')||'[]');
+let activeContinent = null;
+let wrongGuesses = new Set();  // codes guessed wrong this round
+let firstGuessMade = false;    // whether total has been counted for this question
+
+function setMode(mode, btn) {
+  gameMode=mode;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cw=document.getElementById('challenge-wrap');
+  if(mode==='continent'){
+    cw.classList.remove('out');
+    openContinentPicker();
+  }else if(mode==='explore'){
+    cw.classList.add('out');
+    document.getElementById('next-btn').classList.remove('show');
+    document.getElementById('skip-btn').classList.remove('show');
+  }else{
+    cw.classList.remove('out');
+    nextQ();
+  }
+}
+
+function pickQ(){
+  if (!COUNTRIES.length) return null;
+  const pool = gameMode==='continent' && activeContinent
+    ? getContinentPool(activeContinent)
+    : COUNTRIES;
+  if(usedCodes.length>=pool.length) usedCodes=[];
+  let avail = pool.filter(c=>!usedCodes.includes(c.code3) && !collection.some(x=>x.code3===c.code3));
+  if(!avail.length) avail = pool.filter(c=>!usedCodes.includes(c.code3));
+  if(!avail.length) avail = pool;
+  const c=avail[Math.floor(Math.random()*avail.length)];
+  usedCodes.push(c.code3);
+  return c;
+}
+
+function nextQ(){
+  if (!countriesReady || !geoReady || !COUNTRIES.length) return;
+  answered=false;
+  wrongGuesses.clear();
+  firstGuessMade=false;
+  correctISO=null; wrongISO=null;
+  clearHint();
+  buildBorderCanvas();
+  currentQ=pickQ();
+  if (!currentQ) return;
+  roundQ++;
+  document.getElementById('next-btn').classList.remove('show');
+  closePanel();
+  viewLocked = false;
+  targetCamZ = 2.7;
+  autoSpin = rotationEnabled;
+  if(gameMode!=='continent') activeContinent = null;
+
+  const fl=document.getElementById('chal-flag');
+  fl.style.display='none';
+  const shapeWrap=document.getElementById('chal-shape');
+  shapeWrap.style.display='none';
+
+  if(gameMode==='find'){
+    document.getElementById('chal-label').textContent='Find on the globe';
+    document.getElementById('chal-text').textContent=currentQ.name;
+  }else if(gameMode==='flag'){
+    document.getElementById('chal-label').textContent='Which country has this flag?';
+    fl.innerHTML=getCountryFlagMarkup(currentQ); fl.style.display='block';
+    document.getElementById('chal-text').textContent='';
+  }else if(gameMode==='capital'){
+    document.getElementById('chal-label').textContent='Which country has this capital?';
+    document.getElementById('chal-text').textContent='"'+currentQ.capital+'"';
+  }else if(gameMode==='continent'){
+    document.getElementById('chal-label').textContent='Find in '+activeContinent;
+    document.getElementById('chal-text').textContent=currentQ.name;
+  }else if(gameMode==='shape'){
+    document.getElementById('chal-label').textContent='Which country has this shape?';
+    document.getElementById('chal-text').textContent='';
+    const svg=buildCountryShapeSVG(currentQ);
+    if(svg){
+      document.getElementById('chal-shape-inner').innerHTML=svg;
+      shapeWrap.style.display='block';
+    } else {
+      // No shape available — fall back silently to next question
+      setTimeout(()=>nextQ(), 0);
+      return;
+    }
+  }
+  updateProgress();
+  // Globe stays where it is — player searches on their own
+  if (gameMode !== 'explore') {
+    document.getElementById('skip-btn').classList.add('show');
+  }
+}
+
+function skipQ() {
+  if (!gameActive || answered || !currentQ) return;
+  answered = true;
+  wrongGuesses.clear();
+  firstGuessMade = false;
+  // Reset streak — soft penalty for skipping
+  streak = 0;
+  updateScore();
+  // Put the country back in the pool so it appears again later
+  usedCodes = usedCodes.filter(c => c !== currentQ.code3);
+  // Highlight the correct country border so user sees where it was
+  correctISO = currentQ.code3;
+  buildBorderCanvas();
+  const btn = document.getElementById('skip-btn');
+  btn.classList.add('skipping');
+  setTimeout(() => { btn.classList.remove('show', 'skipping'); nextQ(); }, 380);
+}
+
+function syncChallengeWrap() {
+  const cw = document.getElementById('challenge-wrap');
+  if (!cw) return;
+  const inCardsMode = gameMode === 'explore';
+  const collectorOpen = document.getElementById('collector').classList.contains('open');
+  cw.classList.toggle('out', inCardsMode || collectorOpen);
+}
+
+function handleSelect(country){
+  if(!gameActive) return;
+  if(gameMode==='explore'){ showExplore(country); return; }
+  // After answering — panel already opened automatically; ignore extra clicks
+  if(answered) return;
+  if(!currentQ) return;
+
+  const isCorrect =
+    country.code3 === currentQ.code3 ||
+    countryNamesMatch(country, currentQ) ||
+    normalizeCountryName(getQuizMatchName(country)) === normalizeCountryName(getQuizMatchName(currentQ));
+
+  if(isCorrect){
+    // ── CORRECT ────────────────────────────────────────────────────────
+    answered = true;
+    if(!firstGuessMade){ total++; firstGuessMade = true; }
+    score++; streak++;
+    wrongGuesses.clear();
+    document.getElementById('skip-btn').classList.remove('show');
+    correctISO = currentQ.code3; wrongISO = null;
+    buildBorderCanvas();
+    showFeedback(true);
+    // Stop rotation so the highlighted country stays visible on the globe
+    autoSpin = false;
+    viewLocked = true;
+    updateRotationButton();
+    updateScore();
+    // Open the big modal so the player can study the country they just got right
+    setTimeout(()=>showExplore(currentQ), 800);
+    setTimeout(()=>document.getElementById('next-btn').classList.add('show'), 1900);
+  }else{
+    // ── WRONG — allow retry ────────────────────────────────────────────
+    if(wrongGuesses.has(country.code3)) return; // already tried this one
+    wrongGuesses.add(country.code3);
+    if(!firstGuessMade){ total++; streak=0; firstGuessMade=true; updateScore(); }
+    wrongISO = country.code3;
+    buildBorderCanvas();
+    showFeedback(false, country.name);
+    // Clear the wrong highlight after the flash so the player can keep searching
+    setTimeout(()=>{ wrongISO=null; buildBorderCanvas(); }, 1400);
+  }
+}
+
+function showFeedback(ok, wrongName=''){
+  const fb=document.getElementById('feedback');
+  const icon=document.getElementById('fb-icon');
+  const txt=document.getElementById('fb-text');
+  fb.className='show '+(ok?'ok':'bad');
+  icon.textContent=ok?'✦':'✗';
+  txt.textContent=ok?'Correct!':(wrongName?`That's ${wrongName}`:'Wrong!');
+  setTimeout(()=>{fb.className='';},2200);
+}
+
+// Side info-panel was retired in favour of the centred explore modal.
+// Keep these as thin aliases so any caller — old timers, the collector grid,
+// nextQ, etc. — still does the right thing without scattered conditionals.
+function showPanel(c){ showExplore(c); }
+function closePanel(){ closeExplore(); }
+
+// ── EXPLORE MODE MODAL ─────────────────────────────────────────────────
+let exploreCountry = null;
+
+// Render the country's polygon(s) from the GeoJSON feature into an SVG with
+// latitude correction so shapes don't look stretched at high latitudes.
+// Returns '' when no feature is available so callers can hide the slot.
+function buildCountryShapeSVG(country) {
+  const feature = (country && country.feature) || findFeatureByCode(country && country.code3);
+  const geom = feature && feature.geometry;
+  if (!geom) return '';
+  const polygons = geom.type === 'Polygon' ? [geom.coordinates]
+                  : geom.type === 'MultiPolygon' ? geom.coordinates
+                  : null;
+  if (!polygons || !polygons.length) return '';
+
+  // Bounding box across all rings
+  let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
+  polygons.forEach(poly => poly.forEach(ring => ring.forEach(p => {
+    const lon = p[0], lat = p[1];
+    if (Number.isFinite(lon) && Number.isFinite(lat)) {
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+    }
+  })));
+  if (!Number.isFinite(minLon) || !Number.isFinite(minLat)) return '';
+
+  // Russia-style longitude wrap fix: if a country crosses the antimeridian,
+  // GeoJSON often expresses parts of it at +180 and -180 simultaneously. The
+  // bounding box ends up nearly 360°. Detect that and shift the negative-lon
+  // points by +360 so the shape renders as one contiguous outline.
+  let shiftNeg = false;
+  if (maxLon - minLon > 200) {
+    shiftNeg = true;
+    minLon = Infinity; maxLon = -Infinity;
+    polygons.forEach(poly => poly.forEach(ring => ring.forEach(p => {
+      const lon = p[0] < 0 ? p[0] + 360 : p[0];
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+    })));
+  }
+
+  const lonW = Math.max(0.0001, maxLon - minLon);
+  const latH = Math.max(0.0001, maxLat - minLat);
+  // Shrink longitude span by cos(mean lat) so high-latitude countries don't
+  // appear stretched east-west on the screen.
+  const meanLat = (minLat + maxLat) / 2;
+  const cosLat = Math.max(0.05, Math.cos(meanLat * Math.PI / 180));
+  const projW = lonW * cosLat;
+  const projH = latH;
+  const aspect = projW / projH; // >1 means wider than tall
+  const VB = 200;               // viewBox base size — keeps stroke crisp
+  const vbW = aspect >= 1 ? VB : VB * aspect;
+  const vbH = aspect >= 1 ? VB / aspect : VB;
+
+  const mapPoint = (lon, lat) => {
+    if (shiftNeg && lon < 0) lon += 360;
+    const x = ((lon - minLon) * cosLat / projW) * vbW;
+    const y = (1 - (lat - minLat) / latH) * vbH;
+    return [x.toFixed(2), y.toFixed(2)];
+  };
+
+  const path = polygons.map(poly =>
+    poly.map(ring =>
+      ring.map((p, i) => {
+        const [x, y] = mapPoint(p[0], p[1]);
+        return `${i === 0 ? 'M' : 'L'}${x} ${y}`;
+      }).join(' ') + ' Z'
+    ).join(' ')
+  ).join(' ');
+
+  return `<svg viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" preserveAspectRatio="xMidYMid meet" aria-label="${(country.name || '').replace(/"/g,'&quot;')} outline">
+    <path class="country-fill" d="${path}" fill-rule="evenodd"/>
+    <path class="country-stroke" d="${path}" fill-rule="evenodd"/>
+  </svg>`;
+}
+
+function showExplore(c){
+  exploreCountry = c;
+  const p = getCountryProfile(c);
+  // Hide hover label so it doesn't peek through the modal
+  document.getElementById('hover-label').style.opacity = '0';
+
+  document.getElementById('explore-flag').innerHTML = getCountryFlagMarkup(p);
+  document.getElementById('explore-name').textContent = p.name;
+  document.getElementById('explore-region').textContent =
+    getDisplayRegion(p.region) + '  ·  ' + p.code3;
+
+  // Country outline rendered from GeoJSON. If the feature isn't available
+  // (e.g. unmatched code), hide the slot so the layout stays clean.
+  const shapeHost = document.getElementById('explore-shape');
+  const shapeWrap = document.getElementById('explore-shape-wrap');
+  const svg = buildCountryShapeSVG(c);
+  if (svg) {
+    shapeHost.innerHTML = svg;
+    shapeWrap.style.display = '';
+  } else {
+    shapeHost.innerHTML = '';
+    shapeWrap.style.display = 'none';
+  }
+
+  // Stat tiles
+  const statsHost = document.getElementById('explore-stats');
+  const stats = [
+    ['Capital',    p.capital || '—'],
+    ['Population', (p.pop || 0).toLocaleString()],
+    ['Area',       (p.area || 0).toLocaleString() + ' km²'],
+    ['Currency',   p.currency || '—'],
+    ['Language',   p.language || '—'],
+    ['Dish',       COUNTRY_DISH[p.code3] || '—'],
+    ['Demonym',    p.demonym  || '—'],
+    ['Calendar',   p.calendar || '—'],
+  ];
+  statsHost.innerHTML = stats.map(([label, val]) =>
+    `<div class="ex-stat"><div class="lbl">${label}</div><div class="val">${val}</div></div>`
+  ).join('');
+
+  // Facts
+  const factsHost = document.getElementById('explore-facts');
+  factsHost.innerHTML = '';
+  (p.facts || []).forEach((f, i) => {
+    const row = document.createElement('div');
+    row.className = 'ex-fact';
+    row.style.animationDelay = (i * 0.07) + 's';
+    row.innerHTML = `<div class="n">0${i + 1}</div><div class="t">${f}</div>`;
+    factsHost.appendChild(row);
+  });
+
+  // Collect button state
+  const collectBtn = document.getElementById('explore-collect-btn');
+  const has = collection.some(x => x.code3 === p.code3);
+  collectBtn.className = has ? 'collected' : '';
+  collectBtn.textContent = has ? '✓ In Collection' : '✦ Add to Collection';
+  collectBtn.onclick = has
+    ? () => { closeExplore(); openCollector(); }
+    : () => collectFromExplore();
+
+  document.getElementById('explore-modal').classList.add('on');
+  // Pause auto-rotation while reading the modal
+  viewLocked = true;
+  autoSpin = false;
+  updateRotationButton();
+}
+
+function closeExplore(){
+  document.getElementById('explore-modal').classList.remove('on');
+  exploreCountry = null;
+  document.getElementById('hover-label').style.opacity = showHoverLabel ? '1' : '0';
+  viewLocked = false;
+  autoSpin = rotationEnabled;
+  updateRotationButton();
+}
+
+function collectFromExplore(){
+  if (!exploreCountry) return;
+  const p = getCountryProfile(exploreCountry);
+  if (collection.some(x => x.code3 === p.code3)) return;
+  collection.push(p);
+  localStorage.setItem('terra_coll', JSON.stringify(collection));
+  updateCollCount();
+  // Update button state immediately
+  const btn = document.getElementById('explore-collect-btn');
+  btn.className = 'collected';
+  btn.textContent = '✓ In Collection';
+  btn.onclick = () => { closeExplore(); openCollector(); };
+  // Burst animation reusing existing element
+  const burst = document.getElementById('burst');
+  if (burst) {
+    burst.classList.add('go');
+    setTimeout(() => burst.classList.remove('go'), 1400);
+  }
+}
+
+// Allow ESC to close the modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('explore-modal').classList.contains('on')) {
+    closeExplore();
+  }
+});
+
+// Old side-panel collect entry point — delegate to the modal version so
+// any external/legacy caller still works.
+function collectCountry(){ collectFromExplore(); }
+
+let selectMode = false;
+let selectedCodes = new Set();
+
+function enterSelectMode() {
+  selectMode = true;
+  selectedCodes.clear();
+  document.getElementById('collector').classList.add('selecting');
+  updateSelectCount();
+  buildGrid();
+}
+
+function exitSelectMode() {
+  selectMode = false;
+  selectedCodes.clear();
+  document.getElementById('collector').classList.remove('selecting');
+  buildGrid();
+}
+
+function toggleCardSelect(code3, card) {
+  if (selectedCodes.has(code3)) selectedCodes.delete(code3);
+  else selectedCodes.add(code3);
+  card.classList.toggle('selected', selectedCodes.has(code3));
+  updateSelectCount();
+}
+
+function updateSelectCount() {
+  const n = selectedCodes.size;
+  document.getElementById('coll-select-count').textContent = n === 0 ? 'None selected' : `${n} selected`;
+  const btn = document.getElementById('coll-delete-sel-btn');
+  btn.disabled = n === 0;
+}
+
+function deleteSelected() {
+  if (!selectedCodes.size) return;
+  collection = collection.filter(c => !selectedCodes.has(c.code3));
+  localStorage.setItem('terra_coll', JSON.stringify(collection));
+  updateCollCount();
+  buildBorderCanvas();
+  exitSelectMode();
+}
+
+function deleteAll() {
+  if (!collection.length) return;
+  if (!confirm(`Remove all ${collection.length} countries from your collection?`)) return;
+  collection = [];
+  localStorage.setItem('terra_coll', JSON.stringify(collection));
+  updateCollCount();
+  buildBorderCanvas();
+  exitSelectMode();
+}
+
+function removeCountryFromCollection(code3){
+  collection=collection.filter(c=>c.code3!==code3);
+  localStorage.setItem('terra_coll',JSON.stringify(collection));
+  updateCollCount();
+  buildGrid();
+  // If the modal is currently showing this country, refresh its collect button
+  if (exploreCountry && exploreCountry.code3 === code3) {
+    const btn = document.getElementById('explore-collect-btn');
+    if (btn) {
+      btn.className = '';
+      btn.textContent = '✦ Add to Collection';
+    }
+  }
+}
+
+function updateCollCount(){ document.getElementById('coll-count').textContent=collection.length; }
+
+function updateScore(){
+  const numEl = document.getElementById('score-num');
+  numEl.innerHTML = score+' <span>/</span> '+total;
+  numEl.classList.remove('pop');
+  void numEl.offsetWidth;
+  numEl.classList.add('pop');
+
+  const pctEl = document.getElementById('score-pct');
+  if (total > 0) {
+    const pct = Math.round(score / total * 100);
+    pctEl.textContent = pct + '% accuracy';
+  } else {
+    pctEl.textContent = '';
+  }
+
+  const st = document.getElementById('streak-tag');
+  if (streak === 0) {
+    st.textContent = 'STREAK — 0';
+    st.className = '';
+  } else if (streak < 3) {
+    st.textContent = 'STREAK — ' + streak;
+    st.className = '';
+  } else if (streak < 7) {
+    st.textContent = 'STREAK — ' + streak + '  ✦';
+    st.className = 'fire';
+  } else {
+    st.textContent = 'STREAK — ' + streak + '  ✦✦';
+    st.className = 'fire hot';
+  }
+}
+
+function updateProgress(){
+  // Progress bar removed from UI — round count is still tracked internally for
+  // pacing logic (e.g. picking which question pool to draw from), but no longer
+  // displayed at the centre of the screen.
+}
+
+function spinTo(c, zoom, hold=false, snap=false){
+  const ty=-THREE.MathUtils.degToRad(c.lon) - Math.PI/2;
+  // Default XYZ rotation order — Three.js produces M = Rx(rotX) * Ry(rotY)
+  // when z=0, so applying Ry first (longitude swing) then Rx (latitude tilt)
+  // brings (lat, lon) to the camera-facing point with rotX = +lat.
+  const rawTx = THREE.MathUtils.degToRad(c.lat);
+  const tx = Math.max(-Math.PI/2 + 0.05, Math.min(Math.PI/2 - 0.05, rawTx));
+  let diff=ty-rotY;
+  while(diff>Math.PI) diff-=Math.PI*2;
+  while(diff<-Math.PI) diff+=Math.PI*2;
+  targetRotY=rotY+diff; targetRotX=tx;
+  if (snap) {
+    rotY = targetRotY;
+    rotX = targetRotX;
+  }
+  if(zoom){ targetCamZ=hold ? 1.2 : 1.55; }
+  if (snap) {
+    camZ = targetCamZ;
+    camera.position.z = camZ;
+  } else if(!hold && zoom){ setTimeout(()=>{targetCamZ=2.7;},2200); }
+}
+
+function zoomToCorrect(country) {
+  viewLocked = true;
+  autoSpin = false;
+  updateRotationButton();
+  // Gently pan to center on the country using its curated lat/lon.
+  // The country is already on screen (player just clicked it) so the pan is minimal.
+  const lat = country.lat ?? 0;
+  const lon = country.lon ?? 0;
+  const ty = -THREE.MathUtils.degToRad(lon) - Math.PI/2;
+  const rawTx = THREE.MathUtils.degToRad(lat);
+  const tx = Math.max(-Math.PI/2 + 0.05, Math.min(Math.PI/2 - 0.05, rawTx));
+  let diff = ty - rotY;
+  while (diff >  Math.PI) diff -= Math.PI * 2;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  targetRotY = rotY + diff;
+  targetRotX = tx;
+  // Do NOT zoom – keep globe at current distance so player can see the country
+  // targetCamZ unchanged
+}
+
+function focusOnCountry(c, holdZoom=true, snap=false) {
+  const target = getFocusTarget(c);
+  viewLocked = true;
+  autoSpin = false;
+  updateRotationButton();
+  spinTo(target, true, holdZoom, snap);
+  if (snap) {
+    targetCamZ = 2.7;
+    camZ = 2.7;
+    camera.position.z = camZ;
+    rotX = targetRotX;
+    rotY = targetRotY;
+    earth.rotation.set(rotX, rotY, 0);
+    bordMesh.rotation.set(rotX, rotY, 0);
+  }
+  if (!holdZoom) {
+    targetCamZ = 1.35;
+  }
+}
+
+function updateRotationButton() {
+  const btn=document.getElementById('rot-btn');
+  if (btn) btn.querySelector('.btn-lbl').textContent = `Rotation: ${rotationEnabled ? 'On' : 'Off'}`;
+}
+
+function toggleRotation() {
+  rotationEnabled = !rotationEnabled;
+  autoSpin = rotationEnabled;
+  if (!rotationEnabled) {
+    targetRotX = rotX;
+    targetRotY = rotY;
+  } else if (!viewLocked && !isDrag) {
+    autoSpin = true;
+  }
+  updateRotationButton();
+}
+
+function updateGeoButton() {
+  const btn = document.getElementById('geo-btn');
+  if (btn) btn.querySelector('.btn-lbl').textContent = `Geo Lines: ${showGeoLines ? 'On' : 'Off'}`;
+}
+
+function toggleGeoLines() {
+  showGeoLines = !showGeoLines;
+  updateGeoButton();
+  buildBorderCanvas();
+}
+
+let showHoverLabel = true;
+function toggleHoverLabel() {
+  showHoverLabel = !showHoverLabel;
+  document.getElementById('hover-label').style.opacity = showHoverLabel ? '1' : '0';
+  document.getElementById('label-btn').querySelector('.btn-lbl').textContent = `Label: ${showHoverLabel ? 'On' : 'Off'}`;
+}
+
+// Collector
+function openCollector(){
+  if (selectMode) exitSelectMode();
+  buildGrid();
+  document.getElementById('collector').classList.add('open');
+  syncChallengeWrap();
+}
+function closeCollector(){
+  if (selectMode) exitSelectMode();
+  document.getElementById('collector').classList.remove('open');
+  syncChallengeWrap();
+}
+
+let collSort = 'continent'; // 'continent' | 'alpha'
+
+function setCollSort(mode) {
+  collSort = mode;
+  document.getElementById('sort-continent-btn').classList.toggle('active', mode === 'continent');
+  document.getElementById('sort-alpha-btn').classList.toggle('active', mode === 'alpha');
+  buildGrid();
+}
+
+const COUNTRY_DISH = {
+  DZA:'Couscous', AGO:'Muamba de Galinha', BEN:'Kuli-Kuli', BWA:'Seswaa', BFA:'Tô', BDI:'Ugali',
+  CMR:'Ndolé', CPV:'Cachupa', CAF:'Kanda', TCD:'Boule', COM:'Langouste à la vanille', DJI:'Fah-fah',
+  COD:'Poulet moambe', EGY:'Koshari', GNQ:'Muamba de Galinha', ERI:'Injera', SWZ:'Sishebo',
+  ETH:'Injera & Doro Wat', GAB:'Poulet Nyembwe', GMB:'Benachin', GHA:'Fufu & Light Soup',
+  GIN:'Mafé', CIV:'Garba', KEN:'Nyama Choma', LSO:'Pap', LBR:'Jollof Rice', LBY:'Bazeen',
+  MDG:'Romazava', MWI:'Nsima', MLI:'Tiguadège Na', MRT:'Thiéboudienne', MUS:'Dholl Puri',
+  MAR:'Tagine', MOZ:'Piri Piri Chicken', NAM:'Biltong', NER:'Djerma Stew', NGA:'Egusi Soup',
+  COG:'Saka-Saka', RWA:'Isombe', STP:'Calulu', SEN:'Thiéboudienne', SYC:'Fish Curry',
+  SLE:'Cassava Leaves', SOM:'Canjeero', ZAF:'Bobotie', SSD:'Ful Medames', SDN:'Ful Medames',
+  TZA:'Ugali na Nyama', TGO:'Fufu', TUN:'Brik', UGA:'Rolex', ZMB:'Nshima', ZWE:'Sadza',
+  AFG:'Kabuli Pulao', ARM:'Khorovats', AZE:'Plov', BHR:'Machboos', BGD:'Hilsa Curry',
+  BTN:'Ema Datshi', BRN:'Ambuyat', KHM:'Amok Trey', CHN:'Peking Duck', GEO:'Khinkali',
+  IND:'Biryani', IDN:'Nasi Goreng', IRN:'Ghormeh Sabzi', IRQ:'Masgouf', ISR:'Shakshuka',
+  JPN:'Sushi', JOR:'Mansaf', KAZ:'Beshbarmak', KWT:'Machboos', KGZ:'Beshbarmak', LAO:'Laap',
+  LBN:'Kibbeh', MYS:'Nasi Lemak', MDV:'Garudhiya', MNG:'Buuz', MMR:'Mohinga', NPL:'Dal Bhat',
+  PRK:'Naengmyeon', OMN:'Shuwa', PAK:'Biryani', PSE:'Musakhan', PHL:'Adobo', QAT:'Machboos',
+  SAU:'Kabsa', SGP:'Hainanese Chicken Rice', KOR:'Kimchi Jjigae', LKA:'Rice & Curry',
+  SYR:'Kibbeh', TJK:'Plov', THA:'Pad Thai', TLS:'Ikan Pepes', TKM:'Plov', ARE:'Machboos',
+  UZB:'Plov', VNM:'Phở', YEM:'Saltah',
+  ALB:'Tavë Kosi', AND:'Escudella', AUT:'Wiener Schnitzel', BLR:'Draniki', BEL:'Moules-Frites',
+  BIH:'Ćevapi', BGR:'Banitsa', HRV:'Peka', CYP:'Kleftiko', CZE:'Svíčková', DNK:'Smørrebrød',
+  EST:'Verivorst', FIN:'Karjalanpiirakka', FRA:'Coq au Vin', DEU:'Sauerbraten', GRC:'Moussaka',
+  HUN:'Goulash', ISL:'Hákarl', IRL:'Irish Stew', ITA:'Pizza Napoletana', LVA:'Grey Peas & Bacon',
+  LIE:'Käsknöpfle', LTU:'Cepelinai', LUX:'Judd mat Gaardebounen', MLT:'Fenkata', MDA:'Mămăligă',
+  MCO:'Barbagiuan', MNE:'Kacamak', NLD:'Stamppot', MKD:'Tavče Gravče', NOR:'Fårikål',
+  POL:'Bigos', PRT:'Bacalhau', ROU:'Sarmale', RUS:'Borscht', SMR:'Torta Tre Monti',
+  SRB:'Ćevapi', SVK:'Bryndzové Halušky', SVN:'Potica', ESP:'Paella', SWE:'Köttbullar',
+  CHE:'Fondue', TUR:'Kebap', UKR:'Borscht', GBR:'Fish and Chips', VAT:'Cacio e Pepe',
+  ATG:'Fungie & Pepperpot', BHS:'Conch Salad', BRB:'Cou-Cou & Flying Fish', BLZ:'Rice and Beans',
+  CAN:'Poutine', CRI:'Gallo Pinto', CUB:'Ropa Vieja', DMA:'Callaloo Soup', DOM:'La Bandera',
+  SLV:'Pupusas', GRD:'Oil Down', GTM:'Pepián', HTI:'Griot', HND:'Baleadas', JAM:'Jerk Chicken',
+  MEX:'Mole', NIC:'Gallo Pinto', PAN:'Sancocho', KNA:'Goat Water', LCA:'Green Fig & Saltfish',
+  VCT:'Roasted Breadfruit & Jackfish', TTO:'Doubles', USA:'Apple Pie',
+  ARG:'Asado', BOL:'Salteñas', BRA:'Feijoada', CHL:'Cazuela', COL:'Bandeja Paisa',
+  ECU:'Ceviche', GUY:'Pepperpot', PRY:'Sopa Paraguaya', PER:'Ceviche', SUR:'Pom',
+  URY:'Asado', VEN:'Pabellón Criollo',
+  AUS:'Meat Pie', FJI:'Kokoda', KIR:'Te Bua Bua', MHL:'Breadfruit Stew', FSM:'Coconut Crab',
+  NRU:'Coconut Fish', NZL:'Hāngī', PLW:'Taro Pudding', PNG:'Mumu', WSM:'Palusami',
+  SLB:'Poi', TON:'Lu Pulu', TUV:'Pulaka', VUT:'Lap Lap', XKX:'Flija',
+};
+
+const CONTINENT_ACCENTS = {
+  'Europe':        '#5b9cf6',
+  'Asia':          '#f5c842',
+  'Africa':        '#fb923c',
+  'North America': '#34d399',
+  'South America': '#4ade80',
+  'America':       '#34d399',
+  'Oceania':       '#38bdf8',
+};
+
+function getFlagUrl(c) {
+  if (c?.flagSvg) return c.flagSvg;
+  if (c?.flagPng) return c.flagPng;
+  const a2 = getCountryAlpha2(c);
+  if (a2) return `https://flagcdn.com/${a2}.svg`;
+  return '';
+}
+
+function buildGrid(){
+  const grid=document.getElementById('coll-grid'); grid.innerHTML='';
+  document.getElementById('coll-stats').textContent=`${collection.length} collected · ${COUNTRIES.length} total`;
+  const sorted=[...collection].sort((a,b)=>{
+    if (collSort === 'alpha') return a.name.localeCompare(b.name);
+    return getDisplayRegion(a.region).localeCompare(getDisplayRegion(b.region)) || a.name.localeCompare(b.name);
+  });
+  sorted.forEach((c,i)=>{
+    const p=getCountryProfile(c);
+    const card=document.createElement('div');
+    card.className='country-card card-new';
+    card.dataset.code = p.code3;
+    card.style.animationDelay=(i*.04)+'s';
+    card.onclick=()=>{
+      if (selectMode) { toggleCardSelect(p.code3, card); return; }
+      closeCollector();
+      focusOnCountry(p, true, true);
+      showExplore(p);
+    };
+    const accent = CONTINENT_ACCENTS[p.region] || '#6b8fba';
+    card.style.setProperty('--cont', accent);
+    const flagUrl = getFlagUrl(p);
+    const pop = p.pop >= 1e9 ? (p.pop/1e9).toFixed(2).replace(/\.?0+$/,'')+'B'
+              : p.pop >= 1e6 ? (p.pop/1e6).toFixed(1).replace(/\.0$/,'')+'M'
+              : p.pop >= 1e3 ? (p.pop/1e3).toFixed(0)+'K' : (p.pop||'—');
+    const area = p.area >= 1e6 ? (p.area/1e6).toFixed(2).replace(/\.?0+$/,'')+'M km²'
+               : p.area >= 1e3 ? (p.area/1e3).toFixed(0)+'K km²'
+               : p.area ? p.area+' km²' : '—';
+    card.innerHTML=`
+      <div class="card-check"><svg width="11" height="9" viewBox="0 0 11 9" fill="none" stroke="#020509" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4.5 4,7.5 10,1"/></svg></div>
+      <div class="card-hero">
+        ${flagUrl ? `<img class="card-flag-bg" src="${flagUrl}" alt="">` : ''}
+        <div class="card-hero-vignette"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-region">${getDisplayRegion(p.region)}</div>
+        <div class="card-divider"></div>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-lbl">Capital</span><span class="card-val">${p.capital||'—'}</span></div>
+          <div class="card-stat"><span class="card-lbl">Language</span><span class="card-val">${p.language||'—'}</span></div>
+          <div class="card-stat"><span class="card-lbl">Currency</span><span class="card-val">${p.currency||'—'}</span></div>
+          <div class="card-stat"><span class="card-lbl">Dish</span><span class="card-val">${COUNTRY_DISH[p.code3]||'—'}</span></div>
+        </div>
+      </div>
+`;
+    grid.appendChild(card);
+  });
+  const rem=Math.max(0,6-collection.length);
+  for(let i=0;i<rem;i++){
+    const e=document.createElement('div'); e.className='card-empty';
+    e.innerHTML=`<div class="card-empty-icon">?</div><div class="card-empty-text">Undiscovered</div>`;
+    grid.appendChild(e);
+  }
+}
+
+function openContinentPicker(){
+  document.getElementById('continent-picker').classList.add('on');
+}
+
+function closeContinentPicker(){
+  document.getElementById('continent-picker').classList.remove('on');
+}
+
+function chooseContinent(region){
+  activeContinent = region;
+  closeContinentPicker();
+  gameActive = true;
+  viewLocked = false;
+  autoSpin = false;
+  updateRotationButton();
+  const focus = getRegionFocus(region);
+  // Spin to the continent and frame it with a sensible zoom level
+  const ty = -THREE.MathUtils.degToRad(focus.lon) - Math.PI / 2;
+  const rawTx = THREE.MathUtils.degToRad(focus.lat);
+  const tx = Math.max(-Math.PI/2 + 0.05, Math.min(Math.PI/2 - 0.05, rawTx));
+  let diff = ty - rotY;
+  while (diff > Math.PI) diff -= Math.PI * 2;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  targetRotY = rotY + diff;
+  targetRotX = tx;
+  if (focus.camZ) targetCamZ = focus.camZ;
+  // Wait for the rotation to land before serving the first question so the
+  // user can actually see the continent the moment it's loaded.
+  setTimeout(() => nextQ(), 900);
+}
+
+function beginJourney(){
+  if (!countriesReady || !geoReady) {
+    loadMsg.textContent = 'Loading world data…';
+    return;
+  }
+  document.getElementById('intro').classList.add('gone');
+  gameActive=true;
+  clearHint();
+  nextQ();
+}
+
+// Globals
+window.setMode=setMode; window.nextQ=nextQ;
+window.closePanel=closePanel; window.collectCountry=collectCountry;
+window.removeCountryFromCollection=removeCountryFromCollection;
+window.openCollector=openCollector; window.closeCollector=closeCollector;
+window.openContinentPicker=openContinentPicker; window.closeContinentPicker=closeContinentPicker;
+window.chooseContinent=chooseContinent;
+window.toggleGeoLines=toggleGeoLines;
+window.toggleRotation=toggleRotation;
+window.toggleHoverLabel=toggleHoverLabel;
+window.beginJourney=beginJourney;
+window.skipQ=skipQ;
+window.showExplore=showExplore; window.closeExplore=closeExplore;
+window.collectFromExplore=collectFromExplore;
+window.useHint=useHint;
+
+updateCollCount();
+updateGeoButton();
+updateRotationButton();
+</script>
+</body>
+</html>

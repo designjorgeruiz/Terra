@@ -1,0 +1,1360 @@
+{
+  "AFG": {
+    "language": "Pashto, Dari",
+    "demonym": "Afghan",
+    "calendar": "Solar Hijri and Islamic",
+    "alphabet": "Arabic script: الف, ب, ت",
+    "alphabetExample": "Arabic script examples: الف, ب, ت"
+  },
+  "ALB": {
+    "language": "Albanian",
+    "demonym": "Albanian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "DZA": {
+    "language": "Arabic, Tamazight",
+    "demonym": "Algerian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "ARG": {
+    "language": "Spanish",
+    "demonym": "Argentine",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "AUS": {
+    "language": "English",
+    "demonym": "Australian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BRA": {
+    "language": "Portuguese",
+    "demonym": "Brazilian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CAN": {
+    "language": "English, French",
+    "demonym": "Canadian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CHN": {
+    "language": "Mandarin Chinese",
+    "demonym": "Chinese",
+    "calendar": "Gregorian and Chinese lunar",
+    "alphabet": "Chinese characters: 中, 国, 人",
+    "alphabetExample": "Examples: 中, 国, 人"
+  },
+  "COL": {
+    "language": "Spanish",
+    "demonym": "Colombian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "EGY": {
+    "language": "Arabic",
+    "demonym": "Egyptian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "ETH": {
+    "language": "Amharic, Oromo, Tigrinya",
+    "demonym": "Ethiopian",
+    "calendar": "Ethiopian calendar",
+    "alphabet": "Ge'ez script: ሀ, ለ, ሐ",
+    "alphabetExample": "Examples: ሀ, ለ, ሐ"
+  },
+  "FRA": {
+    "language": "French",
+    "demonym": "French",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "DEU": {
+    "language": "German",
+    "demonym": "German",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GHA": {
+    "language": "English, Akan, Ewe, Ga",
+    "demonym": "Ghanaian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GRC": {
+    "language": "Greek",
+    "demonym": "Greek",
+    "calendar": "Gregorian",
+    "alphabet": "Greek alphabet: Α, Β, Γ",
+    "alphabetExample": "Examples: Α, Β, Γ"
+  },
+  "IND": {
+    "language": "Hindi, English, many regional languages",
+    "demonym": "Indian",
+    "calendar": "Gregorian and Indian national",
+    "alphabet": "Devanagari: अ, आ, इ",
+    "alphabetExample": "Examples: अ, आ, इ"
+  },
+  "IDN": {
+    "language": "Indonesian",
+    "demonym": "Indonesian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "IRN": {
+    "language": "Persian (Farsi)",
+    "demonym": "Iranian",
+    "calendar": "Solar Hijri",
+    "alphabet": "Persian script: ا, ب, پ",
+    "alphabetExample": "Examples: ا, ب, پ"
+  },
+  "ITA": {
+    "language": "Italian",
+    "demonym": "Italian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "JPN": {
+    "language": "Japanese",
+    "demonym": "Japanese",
+    "calendar": "Gregorian and Japanese era",
+    "alphabet": "Kanji, Hiragana, Katakana: あ, い, 漢",
+    "alphabetExample": "Examples: あ, い, 漢"
+  },
+  "KEN": {
+    "language": "Swahili, English",
+    "demonym": "Kenyan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MEX": {
+    "language": "Spanish",
+    "demonym": "Mexican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MAR": {
+    "language": "Arabic, Amazigh",
+    "demonym": "Moroccan",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic and Tifinagh: ا, ⴰ, ⴱ",
+    "alphabetExample": "Examples: ا, ⴰ, ⴱ"
+  },
+  "NLD": {
+    "language": "Dutch",
+    "demonym": "Dutch",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NZL": {
+    "language": "English, Maori, NZ Sign Language",
+    "demonym": "New Zealander",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NGA": {
+    "language": "English, Hausa, Yoruba, Igbo",
+    "demonym": "Nigerian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NOR": {
+    "language": "Norwegian",
+    "demonym": "Norwegian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "PER": {
+    "language": "Spanish, Quechua, Aymara",
+    "demonym": "Peruvian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ESP": {
+    "language": "Spanish, Catalan, Galician, Basque",
+    "demonym": "Spanish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "RUS": {
+    "language": "Russian",
+    "demonym": "Russian",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "SAU": {
+    "language": "Arabic",
+    "demonym": "Saudi",
+    "calendar": "Hijri and Gregorian",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "ZAF": {
+    "language": "English, Afrikaans, Zulu, Xhosa, and more",
+    "demonym": "South African",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "KOR": {
+    "language": "Korean",
+    "demonym": "South Korean",
+    "calendar": "Gregorian",
+    "alphabet": "Hangul: 가, 나, 다",
+    "alphabetExample": "Examples: 가, 나, 다"
+  },
+  "SWE": {
+    "language": "Swedish",
+    "demonym": "Swedish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CHE": {
+    "language": "German, French, Italian, Romansh",
+    "demonym": "Swiss",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "THA": {
+    "language": "Thai",
+    "demonym": "Thai",
+    "calendar": "Thai solar calendar",
+    "alphabet": "Thai script: ก, ข, ค",
+    "alphabetExample": "Examples: ก, ข, ค"
+  },
+  "TUR": {
+    "language": "Turkish",
+    "demonym": "Turkish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "UKR": {
+    "language": "Ukrainian",
+    "demonym": "Ukrainian",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "GBR": {
+    "language": "English",
+    "demonym": "British",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "USA": {
+    "language": "English",
+    "demonym": "American",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "VNM": {
+    "language": "Vietnamese",
+    "demonym": "Vietnamese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet with diacritics: A, Â, Ă",
+    "alphabetExample": "Examples: A, Â, Ă"
+  },
+  "AGO": {
+    "language": "Portuguese",
+    "demonym": "Angolan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BEN": {
+    "language": "French",
+    "demonym": "Beninese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BWA": {
+    "language": "English, Setswana",
+    "demonym": "Motswana",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BFA": {
+    "language": "French",
+    "demonym": "Burkinabé",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BDI": {
+    "language": "Kirundi, French, English",
+    "demonym": "Burundian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CMR": {
+    "language": "French, English",
+    "demonym": "Cameroonian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CPV": {
+    "language": "Portuguese, Cape Verdean Creole",
+    "demonym": "Cape Verdean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CAF": {
+    "language": "French, Sango",
+    "demonym": "Central African",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TCD": {
+    "language": "French, Arabic",
+    "demonym": "Chadian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin and Arabic scripts",
+    "alphabetExample": "Examples: A, B, C — ا, ب, ت"
+  },
+  "COM": {
+    "language": "Comorian, Arabic, French",
+    "demonym": "Comorian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic and Latin scripts",
+    "alphabetExample": "Examples: ا, ب, ت — A, B, C"
+  },
+  "DJI": {
+    "language": "French, Arabic",
+    "demonym": "Djiboutian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Latin and Arabic scripts",
+    "alphabetExample": "Examples: A, B, C — ا, ب, ت"
+  },
+  "COD": {
+    "language": "French, Lingala, Kikongo, Swahili, Tshiluba",
+    "demonym": "Congolese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GNQ": {
+    "language": "Spanish, French, Portuguese",
+    "demonym": "Equatoguinean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ERI": {
+    "language": "Tigrinya, Arabic, English",
+    "demonym": "Eritrean",
+    "calendar": "Gregorian and Ge'ez",
+    "alphabet": "Ge'ez script: ሀ, ለ, ሐ",
+    "alphabetExample": "Examples: ሀ, ለ, ሐ"
+  },
+  "SWZ": {
+    "language": "siSwati, English",
+    "demonym": "Swazi",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GAB": {
+    "language": "French",
+    "demonym": "Gabonese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GMB": {
+    "language": "English",
+    "demonym": "Gambian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GIN": {
+    "language": "French",
+    "demonym": "Guinean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CIV": {
+    "language": "French",
+    "demonym": "Ivorian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "LSO": {
+    "language": "Sesotho, English",
+    "demonym": "Mosotho",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "LBR": {
+    "language": "English",
+    "demonym": "Liberian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "LBY": {
+    "language": "Arabic",
+    "demonym": "Libyan",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "MDG": {
+    "language": "Malagasy, French",
+    "demonym": "Malagasy",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MWI": {
+    "language": "English, Chichewa",
+    "demonym": "Malawian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MLI": {
+    "language": "French, Bambara",
+    "demonym": "Malian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MRT": {
+    "language": "Arabic",
+    "demonym": "Mauritanian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "MUS": {
+    "language": "English, French, Mauritian Creole",
+    "demonym": "Mauritian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MOZ": {
+    "language": "Portuguese",
+    "demonym": "Mozambican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NAM": {
+    "language": "English",
+    "demonym": "Namibian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NER": {
+    "language": "French",
+    "demonym": "Nigerien",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "COG": {
+    "language": "French, Lingala, Kituba",
+    "demonym": "Congolese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "RWA": {
+    "language": "Kinyarwanda, French, English, Swahili",
+    "demonym": "Rwandan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "STP": {
+    "language": "Portuguese",
+    "demonym": "São Toméan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SEN": {
+    "language": "French, Wolof",
+    "demonym": "Senegalese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SYC": {
+    "language": "Seychellois Creole, English, French",
+    "demonym": "Seychellois",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SLE": {
+    "language": "English, Krio",
+    "demonym": "Sierra Leonean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SOM": {
+    "language": "Somali, Arabic",
+    "demonym": "Somali",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Latin and Arabic scripts",
+    "alphabetExample": "Examples: A, B, C — ا, ب, ت"
+  },
+  "SSD": {
+    "language": "English",
+    "demonym": "South Sudanese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SDN": {
+    "language": "Arabic, English",
+    "demonym": "Sudanese",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "TZA": {
+    "language": "Swahili, English",
+    "demonym": "Tanzanian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TGO": {
+    "language": "French",
+    "demonym": "Togolese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TUN": {
+    "language": "Arabic, French",
+    "demonym": "Tunisian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "UGA": {
+    "language": "English, Swahili",
+    "demonym": "Ugandan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ZMB": {
+    "language": "English",
+    "demonym": "Zambian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ZWE": {
+    "language": "English, Shona, Ndebele (and 13 more)",
+    "demonym": "Zimbabwean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ARM": {
+    "language": "Armenian",
+    "demonym": "Armenian",
+    "calendar": "Gregorian",
+    "alphabet": "Armenian alphabet: Ա, Բ, Գ",
+    "alphabetExample": "Examples: Ա, Բ, Գ"
+  },
+  "AZE": {
+    "language": "Azerbaijani",
+    "demonym": "Azerbaijani",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BHR": {
+    "language": "Arabic",
+    "demonym": "Bahraini",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "BGD": {
+    "language": "Bengali",
+    "demonym": "Bangladeshi",
+    "calendar": "Gregorian and Bengali",
+    "alphabet": "Bengali script: অ, আ, ই",
+    "alphabetExample": "Examples: অ, আ, ই"
+  },
+  "BTN": {
+    "language": "Dzongkha",
+    "demonym": "Bhutanese",
+    "calendar": "Bhutanese (lunar)",
+    "alphabet": "Tibetan script: ཀ, ཁ, ག",
+    "alphabetExample": "Examples: ཀ, ཁ, ག"
+  },
+  "BRN": {
+    "language": "Malay, English",
+    "demonym": "Bruneian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Latin and Jawi (Arabic) scripts",
+    "alphabetExample": "Examples: A, B, C — ا, ب, ت"
+  },
+  "KHM": {
+    "language": "Khmer",
+    "demonym": "Cambodian",
+    "calendar": "Buddhist and Gregorian",
+    "alphabet": "Khmer script: ក, ខ, គ",
+    "alphabetExample": "Examples: ក, ខ, គ"
+  },
+  "GEO": {
+    "language": "Georgian",
+    "demonym": "Georgian",
+    "calendar": "Gregorian",
+    "alphabet": "Georgian alphabet: ა, ბ, გ",
+    "alphabetExample": "Examples: ა, ბ, გ"
+  },
+  "IRQ": {
+    "language": "Arabic, Kurdish",
+    "demonym": "Iraqi",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "ISR": {
+    "language": "Hebrew, Arabic",
+    "demonym": "Israeli",
+    "calendar": "Hebrew and Gregorian",
+    "alphabet": "Hebrew script: א, ב, ג",
+    "alphabetExample": "Examples: א, ב, ג"
+  },
+  "JOR": {
+    "language": "Arabic",
+    "demonym": "Jordanian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "KAZ": {
+    "language": "Kazakh, Russian",
+    "demonym": "Kazakhstani",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic and (now) Latin: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "KWT": {
+    "language": "Arabic",
+    "demonym": "Kuwaiti",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "KGZ": {
+    "language": "Kyrgyz, Russian",
+    "demonym": "Kyrgyz",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "LAO": {
+    "language": "Lao",
+    "demonym": "Laotian",
+    "calendar": "Buddhist and Gregorian",
+    "alphabet": "Lao script: ກ, ຂ, ຄ",
+    "alphabetExample": "Examples: ກ, ຂ, ຄ"
+  },
+  "LBN": {
+    "language": "Arabic, French",
+    "demonym": "Lebanese",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "MYS": {
+    "language": "Malay",
+    "demonym": "Malaysian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MDV": {
+    "language": "Dhivehi",
+    "demonym": "Maldivian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Thaana script: ހ, ށ, ނ",
+    "alphabetExample": "Examples: ހ, ށ, ނ"
+  },
+  "MNG": {
+    "language": "Mongolian",
+    "demonym": "Mongolian",
+    "calendar": "Gregorian and Lunar",
+    "alphabet": "Cyrillic and Mongol bichig",
+    "alphabetExample": "Examples: А, Б, В — ᠠ, ᠡ"
+  },
+  "MMR": {
+    "language": "Burmese",
+    "demonym": "Burmese",
+    "calendar": "Buddhist and Gregorian",
+    "alphabet": "Burmese script: က, ခ, ဂ",
+    "alphabetExample": "Examples: က, ခ, ဂ"
+  },
+  "NPL": {
+    "language": "Nepali",
+    "demonym": "Nepali",
+    "calendar": "Bikram Sambat and Gregorian",
+    "alphabet": "Devanagari: अ, आ, इ",
+    "alphabetExample": "Examples: अ, आ, इ"
+  },
+  "PRK": {
+    "language": "Korean",
+    "demonym": "North Korean",
+    "calendar": "Juche calendar",
+    "alphabet": "Hangul: 가, 나, 다",
+    "alphabetExample": "Examples: 가, 나, 다"
+  },
+  "OMN": {
+    "language": "Arabic",
+    "demonym": "Omani",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "PAK": {
+    "language": "Urdu, English",
+    "demonym": "Pakistani",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Urdu script: ا, ب, پ",
+    "alphabetExample": "Examples: ا, ب, پ"
+  },
+  "PSE": {
+    "language": "Arabic",
+    "demonym": "Palestinian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "PHL": {
+    "language": "Filipino, English",
+    "demonym": "Filipino",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "QAT": {
+    "language": "Arabic",
+    "demonym": "Qatari",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "SGP": {
+    "language": "English, Mandarin, Malay, Tamil",
+    "demonym": "Singaporean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin, Chinese, Tamil, Jawi",
+    "alphabetExample": "Examples: A, B, C — 中, 国, 人 — அ, ஆ, இ"
+  },
+  "LKA": {
+    "language": "Sinhala, Tamil",
+    "demonym": "Sri Lankan",
+    "calendar": "Gregorian",
+    "alphabet": "Sinhala and Tamil scripts",
+    "alphabetExample": "Examples: අ, ආ — அ, ஆ"
+  },
+  "SYR": {
+    "language": "Arabic",
+    "demonym": "Syrian",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "TJK": {
+    "language": "Tajik",
+    "demonym": "Tajikistani",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "TLS": {
+    "language": "Tetum, Portuguese",
+    "demonym": "Timorese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TKM": {
+    "language": "Turkmen",
+    "demonym": "Turkmen",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ARE": {
+    "language": "Arabic",
+    "demonym": "Emirati",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "UZB": {
+    "language": "Uzbek",
+    "demonym": "Uzbek",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "YEM": {
+    "language": "Arabic",
+    "demonym": "Yemeni",
+    "calendar": "Gregorian and Islamic",
+    "alphabet": "Arabic script: ا, ب, ت",
+    "alphabetExample": "Examples: ا, ب, ت"
+  },
+  "AND": {
+    "language": "Catalan",
+    "demonym": "Andorran",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "AUT": {
+    "language": "German",
+    "demonym": "Austrian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BLR": {
+    "language": "Belarusian, Russian",
+    "demonym": "Belarusian",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "BEL": {
+    "language": "Dutch, French, German",
+    "demonym": "Belgian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BIH": {
+    "language": "Bosnian, Croatian, Serbian",
+    "demonym": "Bosnian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin and Cyrillic",
+    "alphabetExample": "Examples: A, B, C — А, Б, В"
+  },
+  "BGR": {
+    "language": "Bulgarian",
+    "demonym": "Bulgarian",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "HRV": {
+    "language": "Croatian",
+    "demonym": "Croatian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CYP": {
+    "language": "Greek, Turkish",
+    "demonym": "Cypriot",
+    "calendar": "Gregorian",
+    "alphabet": "Greek and Latin",
+    "alphabetExample": "Examples: Α, Β, Γ — A, B, C"
+  },
+  "CZE": {
+    "language": "Czech",
+    "demonym": "Czech",
+    "calendar": "Gregorian",
+    "alphabet": "Latin with diacritics: A, Á, Č",
+    "alphabetExample": "Examples: A, Á, Č"
+  },
+  "DNK": {
+    "language": "Danish",
+    "demonym": "Danish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Æ, Ø, Å",
+    "alphabetExample": "Examples: A, B, Å"
+  },
+  "EST": {
+    "language": "Estonian",
+    "demonym": "Estonian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Õ, Ä, Ö, Ü",
+    "alphabetExample": "Examples: A, Õ, Ä"
+  },
+  "FIN": {
+    "language": "Finnish, Swedish",
+    "demonym": "Finnish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Å, Ä, Ö",
+    "alphabetExample": "Examples: A, Ä, Ö"
+  },
+  "HUN": {
+    "language": "Hungarian",
+    "demonym": "Hungarian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin with diacritics: A, Á, Ö, Ű",
+    "alphabetExample": "Examples: A, Á, Ű"
+  },
+  "ISL": {
+    "language": "Icelandic",
+    "demonym": "Icelander",
+    "calendar": "Gregorian",
+    "alphabet": "Latin plus Þ, Ð, Æ",
+    "alphabetExample": "Examples: A, Þ, Æ"
+  },
+  "IRL": {
+    "language": "Irish, English",
+    "demonym": "Irish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "LVA": {
+    "language": "Latvian",
+    "demonym": "Latvian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Ā, Č, Š, Ž",
+    "alphabetExample": "Examples: A, Ā, Š"
+  },
+  "LIE": {
+    "language": "German",
+    "demonym": "Liechtensteiner",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "LTU": {
+    "language": "Lithuanian",
+    "demonym": "Lithuanian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Ą, Č, Ę, Š, Ū",
+    "alphabetExample": "Examples: A, Ą, Š"
+  },
+  "LUX": {
+    "language": "Luxembourgish, French, German",
+    "demonym": "Luxembourger",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MLT": {
+    "language": "Maltese, English",
+    "demonym": "Maltese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin plus Ċ, Ġ, Ħ, Ż",
+    "alphabetExample": "Examples: A, Ġ, Ħ"
+  },
+  "MDA": {
+    "language": "Romanian",
+    "demonym": "Moldovan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Ă, Â, Î, Ș, Ț",
+    "alphabetExample": "Examples: A, Ă, Ș"
+  },
+  "MCO": {
+    "language": "French",
+    "demonym": "Monégasque",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MNE": {
+    "language": "Montenegrin",
+    "demonym": "Montenegrin",
+    "calendar": "Gregorian",
+    "alphabet": "Latin and Cyrillic",
+    "alphabetExample": "Examples: A, B, C — А, Б, В"
+  },
+  "MKD": {
+    "language": "Macedonian, Albanian",
+    "demonym": "Macedonian",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic: А, Б, В",
+    "alphabetExample": "Examples: А, Б, В"
+  },
+  "POL": {
+    "language": "Polish",
+    "demonym": "Polish",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Ą, Ć, Ę, Ł, Ń, Ó, Ś, Ź, Ż",
+    "alphabetExample": "Examples: A, Ą, Ł"
+  },
+  "PRT": {
+    "language": "Portuguese",
+    "demonym": "Portuguese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ROU": {
+    "language": "Romanian",
+    "demonym": "Romanian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Ă, Â, Î, Ș, Ț",
+    "alphabetExample": "Examples: A, Ă, Ș"
+  },
+  "SMR": {
+    "language": "Italian",
+    "demonym": "Sammarinese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SRB": {
+    "language": "Serbian",
+    "demonym": "Serbian",
+    "calendar": "Gregorian",
+    "alphabet": "Cyrillic and Latin",
+    "alphabetExample": "Examples: А, Б, В — A, B, C"
+  },
+  "SVK": {
+    "language": "Slovak",
+    "demonym": "Slovak",
+    "calendar": "Gregorian",
+    "alphabet": "Latin with diacritics: A, Á, Č, Š",
+    "alphabetExample": "Examples: A, Á, Š"
+  },
+  "SVN": {
+    "language": "Slovenian",
+    "demonym": "Slovenian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet plus Č, Š, Ž",
+    "alphabetExample": "Examples: A, Č, Š"
+  },
+  "VAT": {
+    "language": "Italian, Latin",
+    "demonym": "Vatican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ATG": {
+    "language": "English",
+    "demonym": "Antiguan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BHS": {
+    "language": "English",
+    "demonym": "Bahamian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BRB": {
+    "language": "English",
+    "demonym": "Barbadian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BLZ": {
+    "language": "English",
+    "demonym": "Belizean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CRI": {
+    "language": "Spanish",
+    "demonym": "Costa Rican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CUB": {
+    "language": "Spanish",
+    "demonym": "Cuban",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "DMA": {
+    "language": "English",
+    "demonym": "Dominican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "DOM": {
+    "language": "Spanish",
+    "demonym": "Dominican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SLV": {
+    "language": "Spanish",
+    "demonym": "Salvadoran",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GRD": {
+    "language": "English",
+    "demonym": "Grenadian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GTM": {
+    "language": "Spanish",
+    "demonym": "Guatemalan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "HTI": {
+    "language": "Haitian Creole, French",
+    "demonym": "Haitian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "HND": {
+    "language": "Spanish",
+    "demonym": "Honduran",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "JAM": {
+    "language": "English, Jamaican Patois",
+    "demonym": "Jamaican",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NIC": {
+    "language": "Spanish",
+    "demonym": "Nicaraguan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "PAN": {
+    "language": "Spanish",
+    "demonym": "Panamanian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "KNA": {
+    "language": "English",
+    "demonym": "Kittitian or Nevisian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "LCA": {
+    "language": "English, French Creole",
+    "demonym": "Saint Lucian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "VCT": {
+    "language": "English",
+    "demonym": "Vincentian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TTO": {
+    "language": "English",
+    "demonym": "Trinidadian and Tobagonian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "FJI": {
+    "language": "English, Fijian, Hindi",
+    "demonym": "Fijian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "KIR": {
+    "language": "English, Gilbertese",
+    "demonym": "I-Kiribati",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "MHL": {
+    "language": "Marshallese, English",
+    "demonym": "Marshallese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "FSM": {
+    "language": "English (and 8 official local languages)",
+    "demonym": "Micronesian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "NRU": {
+    "language": "Nauruan, English",
+    "demonym": "Nauruan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "PLW": {
+    "language": "Palauan, English",
+    "demonym": "Palauan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "PNG": {
+    "language": "Tok Pisin, English, Hiri Motu",
+    "demonym": "Papua New Guinean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "WSM": {
+    "language": "Samoan, English",
+    "demonym": "Samoan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SLB": {
+    "language": "English",
+    "demonym": "Solomon Islander",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TON": {
+    "language": "Tongan, English",
+    "demonym": "Tongan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "TUV": {
+    "language": "Tuvaluan, English",
+    "demonym": "Tuvaluan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "VUT": {
+    "language": "Bislama, English, French",
+    "demonym": "Ni-Vanuatu",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "BOL": {
+    "language": "Spanish, Quechua, Aymara, Guarani (and 33 more)",
+    "demonym": "Bolivian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "CHL": {
+    "language": "Spanish",
+    "demonym": "Chilean",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "ECU": {
+    "language": "Spanish, Quechua",
+    "demonym": "Ecuadorian",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "GUY": {
+    "language": "English",
+    "demonym": "Guyanese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "PRY": {
+    "language": "Spanish, Guarani",
+    "demonym": "Paraguayan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "SUR": {
+    "language": "Dutch",
+    "demonym": "Surinamese",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "URY": {
+    "language": "Spanish",
+    "demonym": "Uruguayan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  },
+  "VEN": {
+    "language": "Spanish",
+    "demonym": "Venezuelan",
+    "calendar": "Gregorian",
+    "alphabet": "Latin alphabet: A, B, C",
+    "alphabetExample": "Examples: A, B, C"
+  }
+}
