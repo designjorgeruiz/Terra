@@ -460,7 +460,48 @@ html,body { width:100%; height:100%; background:var(--ink); color:var(--pearl); 
   #left-panel { display: none !important; }
 
   /* ── HIDE hover label (no hover on touch) ── */
-  #hover-label { display: none !important; }
+  /* ── HOVER LABEL — compact pill above challenge pill on mobile ── */
+  #hover-label {
+    opacity: 0;
+    top: auto;
+    bottom: calc(174px + env(safe-area-inset-bottom));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    margin-top: 0;
+    min-width: 0;
+    width: auto;
+    max-width: calc(100vw - 32px);
+    padding: 7px 16px 8px;
+    border-radius: 50px;
+    background: rgba(4,10,22,.58);
+    border: 1px solid rgba(255,255,255,.09);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    box-shadow: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+  }
+  #tip-name {
+    font-size: 0.95rem;
+    line-height: 1.2;
+    display: inline;
+  }
+  #tip-sub {
+    display: block;
+    font-size: 0.52rem;
+    margin-top: 1px;
+    letter-spacing: .12em;
+    opacity: 0.5;
+    color: var(--pearl);
+  }
+  #tip-name .flag-img {
+    width: 1.1em;
+    height: 0.8em;
+  }
 
   /* ── MOBILE FAB — bottom-left, same row as skip/next ── */
   #mobile-fab {
