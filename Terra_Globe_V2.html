@@ -930,6 +930,8 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.75;
 
+const DEFAULT_CAMZ = window.innerWidth <= 768 ? 3.2 : 2.7;
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 1000);
 camera.position.z = DEFAULT_CAMZ;
@@ -1240,7 +1242,6 @@ let isDrag = false, dragStart = {x:0,y:0};
 let dragDist = 0; // track total drag distance to distinguish click vs drag
 let autoSpin = true;
 let rotationEnabled = true;
-const DEFAULT_CAMZ = window.innerWidth <= 768 ? 3.2 : 2.7;
 let camZ = DEFAULT_CAMZ, targetCamZ = DEFAULT_CAMZ;
 let viewLocked = false;
 
