@@ -1678,8 +1678,8 @@ function handleHover(px, py) {
     }
     hoverCountry = country;
     document.getElementById('tip-name').innerHTML = `${getCountryFlagMarkup(country)} ${country.name}`;
-    document.getElementById('tip-sub').textContent =
-      getDisplayRegion(country.region) + (gameMode==='explore' ? ' · Double-click to explore' : ' · Double-click to select');
+    const cap = country.capital && country.capital !== '—' ? country.capital : getDisplayRegion(country.region);
+    document.getElementById('tip-sub').textContent = getDisplayRegion(country.region) + ' · ' + cap;
   } else {
     if (hoveredISO) { hoveredISO=null; hoveredFeature=null; hoveredFeatureKey=null; buildBorderCanvas(); }
     hoverCountry=null;
